@@ -16,8 +16,10 @@ import type * as lib_auth from "../lib/auth.js";
 import type * as lib_customFunctions from "../lib/customFunctions.js";
 import type * as lib_limits from "../lib/limits.js";
 import type * as organizations from "../organizations.js";
+import type * as search from "../search.js";
 import type * as teams from "../teams.js";
 import type * as users from "../users.js";
+import type * as views from "../views.js";
 import type * as webhooks from "../webhooks.js";
 
 import type {
@@ -35,8 +37,10 @@ declare const fullApi: ApiFromModules<{
   "lib/customFunctions": typeof lib_customFunctions;
   "lib/limits": typeof lib_limits;
   organizations: typeof organizations;
+  search: typeof search;
   teams: typeof teams;
   users: typeof users;
+  views: typeof views;
   webhooks: typeof webhooks;
 }>;
 
