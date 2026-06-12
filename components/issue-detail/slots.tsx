@@ -18,9 +18,11 @@ export type IssueDetailSlotProps = {
 };
 
 // Example: import { CommentsPanel } from "@/components/issue-detail/comments-panel";
+import { PlanLimitListener } from "@/components/billing/upgrade-prompt";
 
 export const issueDetailMainSlots: ComponentType<IssueDetailSlotProps>[] = [
   // ...CommentsPanel,
+  PlanLimitListener,
 ];
 
 export const issueDetailSidebarSlots: ComponentType<IssueDetailSlotProps>[] = [
