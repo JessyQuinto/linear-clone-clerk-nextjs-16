@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as cycles from "../cycles.js";
 import type * as http from "../http.js";
 import type * as issues from "../issues.js";
 import type * as labels from "../labels.js";
@@ -16,6 +17,7 @@ import type * as lib_auth from "../lib/auth.js";
 import type * as lib_customFunctions from "../lib/customFunctions.js";
 import type * as lib_limits from "../lib/limits.js";
 import type * as organizations from "../organizations.js";
+import type * as projects from "../projects.js";
 import type * as teams from "../teams.js";
 import type * as users from "../users.js";
 import type * as webhooks from "../webhooks.js";
@@ -27,6 +29,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  cycles: typeof cycles;
   http: typeof http;
   issues: typeof issues;
   labels: typeof labels;
@@ -35,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   "lib/customFunctions": typeof lib_customFunctions;
   "lib/limits": typeof lib_limits;
   organizations: typeof organizations;
+  projects: typeof projects;
   teams: typeof teams;
   users: typeof users;
   webhooks: typeof webhooks;
