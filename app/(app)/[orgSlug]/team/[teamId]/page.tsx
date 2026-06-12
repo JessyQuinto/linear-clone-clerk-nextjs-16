@@ -1,12 +1,13 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { Loader2, Plus } from "lucide-react";
-import { useParams } from "next/navigation";
+import { Columns3, List, Loader2, Plus } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCommands } from "@/components/commands/command-provider";
 import { IssueRow } from "@/components/issues/issue-row";
 import { STATUSES } from "@/components/shared/issue-meta";
@@ -18,6 +19,7 @@ import { StatusIcon } from "@/components/shared/status-icon";
  */
 export default function TeamIssuesPage() {
   const params = useParams<{ orgSlug: string; teamId: string }>();
+  const router = useRouter();
   const teamId = params.teamId as Id<"teams">;
   const team = useQuery(api.teams.get, { teamId });
   const issues = useQuery(api.issues.listByTeam, { teamId });
@@ -53,10 +55,31 @@ export default function TeamIssuesPage() {
           <span className="font-medium">{team.name}</span>
           <span className="text-muted-foreground">Issues</span>
         </div>
-        <Button size="sm" variant="outline" onClick={openCreateIssue}>
-          <Plus className="size-4" />
-          New issue
-        </Button>
+        <div className="flex items-center gap-2">
+          <Tabs
+            value="list"
+            onValueChange={(value) => {
+              if (value === "board") {
+                router.push(`/${params.orgSlug}/team/${teamId}/board`);
+              }
+            }}
+          >
+            <TabsList className="h-7">
+              <TabsTrigger value="board" className="h-6 gap-1 px-2 text-xs">
+                <Columns3 className="size-3.5" />
+                Board
+              </TabsTrigger>
+              <TabsTrigger value="list" className="h-6 gap-1 px-2 text-xs">
+                <List className="size-3.5" />
+                List
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <Button size="sm" variant="outline" onClick={openCreateIssue}>
+            <Plus className="size-4" />
+            New issue
+          </Button>
+        </div>
       </header>
       <ScrollArea className="flex-1">
         {issues.length === 0 ? (
