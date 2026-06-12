@@ -1,28 +1,36 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import type { Metadata } from "next";
+import { Cta } from "@/components/marketing/cta";
+import { FeatureGrid } from "@/components/marketing/feature-grid";
+import { FeaturesAi } from "@/components/marketing/features-ai";
+import { FeaturesBoard } from "@/components/marketing/features-board";
+import { FeaturesIssues } from "@/components/marketing/features-issues";
+import { FeaturesKeyboard } from "@/components/marketing/features-keyboard";
+import { Footer } from "@/components/marketing/footer";
+import { Hero } from "@/components/marketing/hero";
+import { LogoCloud } from "@/components/marketing/logo-cloud";
+import { Testimonials } from "@/components/marketing/testimonials";
 
-/**
- * Placeholder landing page — Track F replaces this with the full
- * marketing page.
- */
+export const metadata: Metadata = {
+  title: "Vector — The issue tracker built for speed",
+  description:
+    "Plan, track, and ship with issues, boards, and cycles in a keyboard-first workspace — with an AI agent that handles the busywork. Free for teams of 3.",
+};
+
 export default function LandingPage() {
   return (
-    <main className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 py-32 text-center">
-      <h1 className="text-balance text-5xl font-semibold tracking-tight">
-        Plan. Build. Ship.
-      </h1>
-      <p className="max-w-xl text-balance text-lg text-muted-foreground">
-        Vector is the issue tracker built for speed — projects, cycles, and a
-        keyboard-first workflow, with an AI agent on your team.
-      </p>
-      <div className="flex gap-3">
-        <Button size="lg" asChild>
-          <Link href="/sign-up">Get started for free</Link>
-        </Button>
-        <Button size="lg" variant="outline" asChild>
-          <Link href="/pricing">View pricing</Link>
-        </Button>
-      </div>
-    </main>
+    <>
+      <main>
+        <Hero />
+        <LogoCloud />
+        <FeaturesIssues />
+        <FeaturesBoard />
+        <FeaturesAi />
+        <FeaturesKeyboard />
+        <FeatureGrid />
+        <Testimonials />
+        <Cta />
+      </main>
+      <Footer />
+    </>
   );
 }
