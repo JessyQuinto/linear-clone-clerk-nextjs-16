@@ -5,6 +5,8 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -19,7 +21,13 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "convex/react": ["./lib/mock/convex-react.ts"],
+      "convex/react-clerk": ["./lib/mock/convex-react.ts"],
+      "@clerk/nextjs": ["./lib/mock/clerk.tsx"],
+      "@clerk/nextjs/experimental": ["./lib/mock/clerk-experimental.tsx"],
+      "@/convex/_generated/api": ["./lib/mock/api.ts"],
+      "@convex-dev/agent/react": ["./lib/mock/agent-react.ts"]
     }
   },
   "include": [

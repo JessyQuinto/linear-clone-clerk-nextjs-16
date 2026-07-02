@@ -67,7 +67,7 @@ export function ProjectProperties({ project }: { project: Doc<"projects"> }) {
     updateProject({ projectId: project._id, ...patch }).catch(
       (error: unknown) => {
         toast.error(
-          error instanceof Error ? error.message : "Failed to update project"
+          error instanceof Error ? error.message : "Error al actualizar el proyecto"
         );
       }
     );
@@ -76,18 +76,18 @@ export function ProjectProperties({ project }: { project: Doc<"projects"> }) {
   const handleDelete = async () => {
     try {
       await removeProject({ projectId: project._id });
-      toast.success("Project deleted");
+      toast.success("Proyecto eliminado");
       router.push(`/${params.orgSlug}/projects`);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete project"
+        error instanceof Error ? error.message : "Error al eliminar el proyecto"
       );
     }
   };
 
   return (
     <div className="flex flex-col gap-3">
-      <PropertyRow label="Status">
+      <PropertyRow label="Estado">
         <Select
           value={project.status}
           onValueChange={(value) => update({ status: value as ProjectStatus })}
@@ -109,7 +109,7 @@ export function ProjectProperties({ project }: { project: Doc<"projects"> }) {
         </Select>
       </PropertyRow>
 
-      <PropertyRow label="Lead">
+      <PropertyRow label="Responsable">
         <Select
           value={project.leadId ?? NO_LEAD}
           onValueChange={(value) =>
@@ -122,11 +122,11 @@ export function ProjectProperties({ project }: { project: Doc<"projects"> }) {
             size="sm"
             className="w-36 gap-1.5 border-none shadow-none"
           >
-            <SelectValue placeholder="No lead" />
+            <SelectValue placeholder="Sin responsable" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={NO_LEAD}>
-              <span className="text-muted-foreground">No lead</span>
+              <span className="text-muted-foreground">Sin responsable</span>
             </SelectItem>
             {members?.map((member) => (
               <SelectItem key={member.userId} value={member.userId}>
@@ -138,14 +138,14 @@ export function ProjectProperties({ project }: { project: Doc<"projects"> }) {
         </Select>
       </PropertyRow>
 
-      <PropertyRow label="Target date">
+      <PropertyRow label="Fecha objetivo">
         <input
           type="date"
           value={project.targetDate ? msToInputDate(project.targetDate) : ""}
           onChange={(e) =>
             update({ targetDate: inputDateToMs(e.target.value, "end") ?? null })
           }
-          aria-label="Target date"
+          aria-label="Fecha objetivo"
           className="h-8 rounded-md px-2 text-xs text-foreground outline-none transition-colors hover:bg-accent [color-scheme:light] dark:[color-scheme:dark]"
         />
       </PropertyRow>
@@ -179,24 +179,24 @@ export function ProjectProperties({ project }: { project: Doc<"projects"> }) {
             className="justify-start text-destructive hover:text-destructive"
           >
             <Trash2 className="size-4" />
-            Delete project
+            Eliminar proyecto
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {project.name}?</AlertDialogTitle>
+            <AlertDialogTitle>¿Eliminar {project.name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              The project will be permanently deleted. Its issues are kept and
-              simply detached from the project.
+              El proyecto se eliminará permanentemente. Sus tareas se mantienen y
+              simplemente se desvinculan del proyecto.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => void handleDelete()}
               className="bg-destructive text-white hover:bg-destructive/90"
             >
-              Delete
+              Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

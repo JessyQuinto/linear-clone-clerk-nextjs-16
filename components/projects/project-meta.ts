@@ -4,12 +4,12 @@ import { IssueStatus } from "@/components/shared/issue-meta";
 export type ProjectStatus = Doc<"projects">["status"];
 
 export const PROJECT_STATUSES: { value: ProjectStatus; label: string }[] = [
-  { value: "backlog", label: "Backlog" },
-  { value: "planned", label: "Planned" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "paused", label: "Paused" },
-  { value: "completed", label: "Completed" },
-  { value: "canceled", label: "Canceled" },
+  { value: "backlog", label: "Pendiente" },
+  { value: "planned", label: "Planificado" },
+  { value: "in_progress", label: "En progreso" },
+  { value: "paused", label: "Pausado" },
+  { value: "completed", label: "Completado" },
+  { value: "canceled", label: "Cancelado" },
 ];
 
 export function projectStatusLabel(status: ProjectStatus): string {

@@ -61,8 +61,8 @@ export function AiComposer({
           onKeyDown={onKeyDown}
           placeholder={
             disabled
-              ? (disabledReason ?? "AI is unavailable")
-              : "Ask Vector to create, find or report on issues…"
+              ? (disabledReason ?? "La IA no está disponible")
+              : "Preguntale a PANEL STYT para crear, buscar o reportar tareas…"
           }
           disabled={disabled || sending}
           rows={1}
@@ -71,7 +71,7 @@ export function AiComposer({
         <Button
           type="submit"
           size="icon"
-          aria-label="Send message"
+          aria-label="Enviar mensaje"
           className="size-7 shrink-0"
           disabled={disabled || sending || !text.trim()}
         >
@@ -79,8 +79,8 @@ export function AiComposer({
         </Button>
       </form>
       <p className="mx-auto mt-1.5 max-w-2xl px-1 text-[10px] text-muted-foreground">
-        Vector can create and edit issues in your workspace. Enter to send,
-        Shift+Enter for a new line.
+        PANEL STYT puede crear y editar tareas en tu espacio de trabajo. Enter para enviar,
+        Shift+Enter para nueva línea.
       </p>
     </div>
   );

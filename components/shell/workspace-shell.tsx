@@ -4,9 +4,8 @@ import { useOrganizationList } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
-import { PlanLimitListener } from "@/components/billing/upgrade-prompt";
 import { CommandProvider } from "@/components/commands/command-provider";
 import { AppSidebar } from "./app-sidebar";
 
@@ -33,6 +32,11 @@ export function WorkspaceShell({
   orgSlug: string;
   children: ReactNode;
 }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const router = useRouter();
   const { isLoaded, setActive, userMemberships } = useOrganizationList({
     userMemberships: { infinite: true },
@@ -50,7 +54,6 @@ export function WorkspaceShell({
     if (targetMembership) {
       void setActive({ organization: targetMembership.organization.id });
     } else if (!userMemberships.isLoading && !userMemberships.hasNextPage) {
-      // The user doesn't belong to an org with this slug.
       router.replace("/onboarding");
     }
   }, [
@@ -65,28 +68,24 @@ export function WorkspaceShell({
   const currentUser = useQuery(api.users.current);
   const currentOrg = useQuery(api.organizations.current);
 
-  if (!isLoaded || (needsSwitch && currentOrg === undefined)) {
-    return <FullScreenLoader label="Loading workspace…" />;
+  if (!mounted || !isLoaded || (needsSwitch && currentOrg === undefined)) {
+    return <FullScreenLoader label="Cargando espacio de trabajo…" />;
   }
 
-  // Webhook sync still in flight — Convex queries are reactive, so this
-  // resolves by itself within a second or two of first sign-up.
   if (currentUser === null || currentOrg === null) {
-    return <FullScreenLoader label="Setting up your workspace…" />;
+    return <FullScreenLoader label="Configurando tu espacio de trabajo…" />;
   }
 
   if (currentUser === undefined || currentOrg === undefined) {
-    return <FullScreenLoader label="Loading workspace…" />;
+    return <FullScreenLoader label="Cargando espacio de trabajo…" />;
   }
 
   if (currentOrg.slug !== orgSlug) {
-    return <FullScreenLoader label="Switching organization…" />;
+    return <FullScreenLoader label="Cambiando de organización…" />;
   }
 
   return (
     <CommandProvider>
-      {/* Global upgrade prompt: catches free-plan limit errors toasted anywhere in the workspace. */}
-      <PlanLimitListener />
       <div className="flex h-dvh overflow-hidden">
         <AppSidebar />
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">

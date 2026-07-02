@@ -10,6 +10,8 @@ import {
   RefreshCcw,
   Search,
   SquarePen,
+  Wrench,
+  ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -28,28 +30,28 @@ import { CreateTeamDialog } from "@/components/teams/create-team-dialog";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 
-function NavLink({
-  href,
-  icon,
-  children,
-  exact = false,
-}: {
+interface NavLinkProps {
   href: string;
+  exact?: boolean;
   icon: ReactNode;
   children: ReactNode;
-  exact?: boolean;
-}) {
+}
+
+function NavLink({ href, exact, icon, children }: NavLinkProps) {
   const pathname = usePathname();
   const active = exact ? pathname === href : pathname.startsWith(href);
+
   return (
     <Link
       href={href}
       className={cn(
-        "flex h-7 items-center gap-2 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
-        active && "bg-accent text-foreground"
+        "flex h-7 items-center gap-2 rounded px-2 text-sm transition-colors",
+        active
+          ? "bg-accent text-accent-foreground font-medium"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground"
       )}
     >
-      {icon}
+      <span className="shrink-0">{icon}</span>
       <span className="truncate">{children}</span>
     </Link>
   );
@@ -57,6 +59,7 @@ function NavLink({
 
 export function AppSidebar() {
   const params = useParams<{ orgSlug: string }>();
+  const pathname = usePathname();
   const teams = useQuery(api.teams.list);
   const { openCreateIssue, openPalette } = useCommands();
   const [createTeamOpen, setCreateTeamOpen] = useState(false);
@@ -83,12 +86,12 @@ export function AppSidebar() {
               size="icon"
               className="size-7"
               onClick={openCreateIssue}
-              aria-label="New issue"
+              aria-label="Nueva tarea"
             >
               <SquarePen className="size-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="right">New issue (C)</TooltipContent>
+          <TooltipContent side="right">Nueva tarea (C)</TooltipContent>
         </Tooltip>
       </div>
 
@@ -98,7 +101,7 @@ export function AppSidebar() {
           className="flex h-7 w-full items-center gap-2 rounded-md border bg-background px-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <Search className="size-3.5" />
-          Search…
+          Buscar…
           <kbd className="ml-auto rounded border bg-muted px-1 font-mono text-[10px]">
             ⌘K
           </kbd>
@@ -108,27 +111,23 @@ export function AppSidebar() {
       <ScrollArea className="flex-1 px-3">
         <nav className="flex flex-col gap-0.5 pb-2">
           <NavLink href={base} exact icon={<Box className="size-4" />}>
-            Workspace
+            Espacio de trabajo
           </NavLink>
-          {/* Track B adds /projects + /cycles nav; Track D adds /ai nav */}
           <NavLink href={`${base}/projects`} icon={<Box className="size-4" />}>
-            Projects
+            Proyectos
           </NavLink>
-          <NavLink
-            href={`${base}/cycles`}
-            icon={<RefreshCcw className="size-4" />}
-          >
-            Cycles
+          <NavLink href={`${base}/cycles`} icon={<RefreshCcw className="size-4" />}>
+            Ciclos
           </NavLink>
           <NavLink href={`${base}/ai`} icon={<Bot className="size-4" />}>
-            AI Agent
+            Agente IA
           </NavLink>
         </nav>
 
         <Collapsible defaultOpen className="pb-4">
           <div className="flex items-center justify-between">
             <CollapsibleTrigger className="flex items-center gap-1 py-1 text-xs font-medium text-muted-foreground hover:text-foreground">
-              Your teams
+              Tus equipos
               <ChevronDown className="size-3" />
             </CollapsibleTrigger>
             <Button
@@ -136,7 +135,7 @@ export function AppSidebar() {
               size="icon"
               className="size-5"
               onClick={() => setCreateTeamOpen(true)}
-              aria-label="Create team"
+              aria-label="Crear equipo"
             >
               <Plus className="size-3.5" />
             </Button>
@@ -161,7 +160,7 @@ export function AppSidebar() {
                 className="flex h-7 items-center gap-2 rounded-md px-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
               >
                 <Plus className="size-4" />
-                Create your first team
+                Crear tu primer equipo
               </button>
             )}
           </CollapsibleContent>

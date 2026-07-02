@@ -66,7 +66,7 @@ export function CreateCycleDialog({
         startDate: startMs,
         endDate: endMs,
       });
-      toast.success("Cycle created");
+      toast.success("Ciclo creado");
       onOpenChange(false);
       setName("");
       setStart(msToInputDate(Date.now()));
@@ -76,7 +76,7 @@ export function CreateCycleDialog({
       }
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to create cycle"
+        error instanceof Error ? error.message : "Error al crear el ciclo"
       );
     } finally {
       setSubmitting(false);
@@ -88,13 +88,13 @@ export function CreateCycleDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-sm font-medium text-muted-foreground">
-            New cycle
+            Nuevo ciclo
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <Input
             autoFocus
-            placeholder="Cycle name (optional — defaults to Cycle N)"
+            placeholder="Nombre del ciclo (opcional — predeterminado: Ciclo N)"
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
@@ -106,7 +106,7 @@ export function CreateCycleDialog({
           />
           <div className="flex flex-wrap items-end gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-muted-foreground">Team</Label>
+              <Label className="text-xs text-muted-foreground">Equipo</Label>
               <Select
                 value={teamId ?? ""}
                 onValueChange={(value) =>
@@ -114,7 +114,7 @@ export function CreateCycleDialog({
                 }
               >
                 <SelectTrigger size="sm" className="w-auto gap-1.5">
-                  <SelectValue placeholder="Team" />
+                  <SelectValue placeholder="Equipo" />
                 </SelectTrigger>
                 <SelectContent>
                   {teams?.map((team) => (
@@ -126,42 +126,42 @@ export function CreateCycleDialog({
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-muted-foreground">Start</Label>
+              <Label className="text-xs text-muted-foreground">Inicio</Label>
               <input
                 type="date"
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
-                aria-label="Start date"
+                aria-label="Fecha de inicio"
                 className="h-8 rounded-md border bg-transparent px-2 text-xs text-foreground outline-none [color-scheme:light] dark:[color-scheme:dark]"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-muted-foreground">End</Label>
+              <Label className="text-xs text-muted-foreground">Fin</Label>
               <input
                 type="date"
                 value={end}
                 onChange={(e) => setEnd(e.target.value)}
-                aria-label="End date"
+                aria-label="Fecha de fin"
                 className="h-8 rounded-md border bg-transparent px-2 text-xs text-foreground outline-none [color-scheme:light] dark:[color-scheme:dark]"
               />
             </div>
           </div>
           {!datesValid && (
             <p className="text-xs text-destructive">
-              End date must be after the start date.
+              La fecha de fin debe ser posterior a la fecha de inicio.
             </p>
           )}
         </div>
         <div className="flex justify-end gap-2">
           <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
-            Cancel
+            Cancelar
           </Button>
           <Button
             size="sm"
             disabled={!teamId || !datesValid || submitting}
             onClick={() => void handleSubmit()}
           >
-            Create cycle
+            Crear ciclo
           </Button>
         </div>
       </DialogContent>

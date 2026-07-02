@@ -6,13 +6,9 @@ import type {
   OrganizationInvitationResource,
   OrganizationMembershipResource,
 } from "@clerk/nextjs/types";
-import { useQuery } from "convex/react";
 import { Loader2, Mail, Trash2, UserPlus } from "lucide-react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { toast } from "sonner";
-import { api } from "@/convex/_generated/api";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,14 +39,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { UserAvatar } from "@/components/shared/user-avatar";
-import { planForOrg } from "@/lib/plans";
 
 const ROLES: { value: OrganizationCustomRoleKey; label: string }[] = [
-  { value: "org:member", label: "Member" },
+  { value: "org:member", label: "Miembro" },
   { value: "org:admin", label: "Admin" },
 ];
 
-/** Return type of `useOrganization` as instantiated below (infinite lists). */
 type OrgListsReturn = ReturnType<
   typeof useOrganization<{
     memberships: { infinite: true };
@@ -92,17 +86,16 @@ function membershipDisplayName(
 
 /**
  * Members management: Clerk-backed member list, role management, removal,
- * and email invitations — with seat caps from the workspace plan.
+ * and email invitations.
  */
 export function MembersManager() {
-  const org = useQuery(api.organizations.current);
   const { isLoaded, organization, membership, memberships, invitations } =
     useOrganization({
       memberships: { infinite: true },
       invitations: { infinite: true },
     });
 
-  if (!isLoaded || org === undefined || !organization) {
+  if (!isLoaded || !organization) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="size-4 animate-spin text-muted-foreground" />
@@ -110,52 +103,35 @@ export function MembersManager() {
     );
   }
 
-  if (org === null) {
-    return (
-      <p className="py-20 text-center text-sm text-muted-foreground">
-        Workspace not found.
-      </p>
-    );
-  }
-
-  const plan = planForOrg(org.plan);
   const isAdmin = membership?.role === "org:admin";
   const memberCount = memberships?.count ?? organization.membersCount;
   const pendingCount =
     invitations?.count ?? organization.pendingInvitationsCount;
-  const seatsUsed = memberCount + pendingCount;
-  const atSeatLimit = plan.maxSeats !== null && seatsUsed >= plan.maxSeats;
 
   return (
     <>
       <div>
-        <h1 className="text-base font-semibold">Members</h1>
+        <h1 className="text-base font-semibold">Miembros</h1>
         <p className="text-xs text-muted-foreground">
-          {memberCount} {memberCount === 1 ? "member" : "members"}
-          {pendingCount > 0 && ` · ${pendingCount} pending`}
-          {plan.maxSeats !== null
-            ? ` · ${seatsUsed} of ${plan.maxSeats} seats used on ${plan.name}`
-            : ` · unlimited seats on ${plan.name}`}
+          {memberCount} {memberCount === 1 ? "miembro" : "miembros"}
+          {pendingCount > 0 && ` · ${pendingCount} pendiente${pendingCount > 1 ? "s" : ""}`}
         </p>
       </div>
 
       {isAdmin && (
         <InviteMemberForm
-          atSeatLimit={atSeatLimit}
-          planName={plan.name}
-          isFreePlan={org.plan === "free"}
           onInvited={() => void invitations?.revalidate?.()}
         />
       )}
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium">People</h2>
+        <h2 className="text-sm font-medium">Personas</h2>
         <MembersTable isAdmin={isAdmin} memberships={memberships} />
       </section>
 
       {(invitations?.data?.length ?? 0) > 0 && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-sm font-medium">Pending invitations</h2>
+          <h2 className="text-sm font-medium">Invitaciones pendientes</h2>
           <PendingInvitations isAdmin={isAdmin} invitations={invitations} />
         </section>
       )}
@@ -164,17 +140,10 @@ export function MembersManager() {
 }
 
 function InviteMemberForm({
-  atSeatLimit,
-  planName,
-  isFreePlan,
   onInvited,
 }: {
-  atSeatLimit: boolean;
-  planName: string;
-  isFreePlan: boolean;
   onInvited: () => void;
 }) {
-  const params = useParams<{ orgSlug: string }>();
   const { organization } = useOrganization();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<OrganizationCustomRoleKey>("org:member");
@@ -189,31 +158,15 @@ function InviteMemberForm({
     setSubmitting(true);
     try {
       await organization.inviteMember({ emailAddress, role });
-      toast.success(`Invitation sent to ${emailAddress}`);
+      toast.success(`Invitación enviada a ${emailAddress}`);
       setEmail("");
       onInvited();
     } catch (error) {
-      toast.error(clerkErrorMessage(error, "Failed to send invitation"));
+      toast.error(clerkErrorMessage(error, "Error al enviar la invitación"));
     } finally {
       setSubmitting(false);
     }
   };
-
-  if (atSeatLimit) {
-    return (
-      <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
-        <p className="text-xs text-amber-600 dark:text-amber-400">
-          All {planName} plan seats are in use.{" "}
-          {isFreePlan
-            ? "Upgrade to Pro for up to 10 seats, or Enterprise for unlimited members."
-            : "Upgrade to Enterprise for unlimited members."}
-        </p>
-        <Button size="sm" asChild>
-          <Link href={`/${params.orgSlug}/settings/billing`}>Upgrade</Link>
-        </Button>
-      </div>
-    );
-  }
 
   return (
     <form
@@ -225,7 +178,7 @@ function InviteMemberForm({
         <Input
           type="email"
           required
-          placeholder="colleague@company.com"
+          placeholder="colega@empresa.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="h-8 pl-8 text-sm"
@@ -248,7 +201,7 @@ function InviteMemberForm({
       </Select>
       <Button type="submit" size="sm" disabled={!email.trim() || submitting}>
         <UserPlus className="size-3.5" />
-        Invite
+        Invitar
       </Button>
     </form>
   );
@@ -269,20 +222,20 @@ function MembersTable({
   ) => {
     try {
       await member.update({ role });
-      toast.success(`${membershipDisplayName(member)} is now ${role === "org:admin" ? "an admin" : "a member"}`);
+      toast.success(`${membershipDisplayName(member)} ahora es ${role === "org:admin" ? "admin" : "miembro"}`);
       await memberships?.revalidate?.();
     } catch (error) {
-      toast.error(clerkErrorMessage(error, "Failed to update role"));
+      toast.error(clerkErrorMessage(error, "Error al actualizar el rol"));
     }
   };
 
   const handleRemove = async (member: OrganizationMembershipResource) => {
     try {
       await member.destroy();
-      toast.success(`Removed ${membershipDisplayName(member)}`);
+      toast.success(`Eliminado ${membershipDisplayName(member)}`);
       await memberships?.revalidate?.();
     } catch (error) {
-      toast.error(clerkErrorMessage(error, "Failed to remove member"));
+      toast.error(clerkErrorMessage(error, "Error al eliminar el miembro"));
     }
   };
 
@@ -291,9 +244,9 @@ function MembersTable({
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="px-3 text-xs">User</TableHead>
-            <TableHead className="text-xs">Joined</TableHead>
-            <TableHead className="w-32 text-xs">Role</TableHead>
+            <TableHead className="px-3 text-xs">Usuario</TableHead>
+            <TableHead className="text-xs">Se unió</TableHead>
+            <TableHead className="w-32 text-xs">Rol</TableHead>
             {isAdmin && <TableHead className="w-10" />}
           </TableRow>
         </TableHeader>
@@ -318,7 +271,7 @@ function MembersTable({
                             variant="secondary"
                             className="h-4 rounded-full px-1.5 text-[10px]"
                           >
-                            You
+                            Vos
                           </Badge>
                         )}
                       </span>
@@ -355,7 +308,7 @@ function MembersTable({
                     </Select>
                   ) : (
                     <span className="text-xs text-muted-foreground">
-                      {member.role === "org:admin" ? "Admin" : "Member"}
+                      {member.role === "org:admin" ? "Admin" : "Miembro"}
                     </span>
                   )}
                 </TableCell>
@@ -367,7 +320,7 @@ function MembersTable({
                           <Button
                             variant="ghost"
                             size="icon-sm"
-                            aria-label={`Remove ${name}`}
+                            aria-label={`Eliminar ${name}`}
                             className="text-muted-foreground hover:text-destructive"
                           >
                             <Trash2 className="size-3.5" />
@@ -376,20 +329,19 @@ function MembersTable({
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>
-                              Remove {name}?
+                              ¿Eliminar {name}?
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                              They will immediately lose access to this
-                              workspace and its issues. You can invite them
-                              again later.
+                              Perderá acceso inmediato a este espacio de trabajo
+                              y sus tareas. Podés invitarlo nuevamente después.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => void handleRemove(member)}
                             >
-                              Remove member
+                              Eliminar miembro
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -410,7 +362,7 @@ function MembersTable({
             disabled={memberships.isFetching}
             onClick={() => memberships.fetchNext?.()}
           >
-            Load more
+            Cargar más
           </Button>
         </div>
       )}
@@ -428,10 +380,10 @@ function PendingInvitations({
   const handleRevoke = async (invitation: OrganizationInvitationResource) => {
     try {
       await invitation.revoke();
-      toast.success(`Invitation to ${invitation.emailAddress} revoked`);
+      toast.success(`Invitación a ${invitation.emailAddress} revocada`);
       await invitations?.revalidate?.();
     } catch (error) {
-      toast.error(clerkErrorMessage(error, "Failed to revoke invitation"));
+      toast.error(clerkErrorMessage(error, "Error al revocar la invitación"));
     }
   };
 
@@ -452,10 +404,10 @@ function PendingInvitations({
                 </div>
               </TableCell>
               <TableCell className="py-2 text-xs text-muted-foreground">
-                Invited {formatDate(invitation.createdAt)}
+                Invitado {formatDate(invitation.createdAt)}
               </TableCell>
               <TableCell className="py-2 text-xs text-muted-foreground">
-                {invitation.role === "org:admin" ? "Admin" : "Member"}
+                {invitation.role === "org:admin" ? "Admin" : "Miembro"}
               </TableCell>
               {isAdmin && (
                 <TableCell className="w-20 py-2 pr-3 text-right">
@@ -465,7 +417,7 @@ function PendingInvitations({
                     className="text-muted-foreground hover:text-destructive"
                     onClick={() => void handleRevoke(invitation)}
                   >
-                    Revoke
+                    Revocar
                   </Button>
                 </TableCell>
               )}

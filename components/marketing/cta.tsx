@@ -15,21 +15,17 @@ export function Cta() {
       />
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center px-6 py-24 text-center md:py-32">
         <h2 className="max-w-2xl text-4xl font-semibold tracking-tighter text-balance md:text-5xl">
-          Stop managing your tracker. Start shipping.
+          Dejá de administrar tu tracker. Empezá a entregar.
         </h2>
         <p className="mt-5 max-w-md text-base text-balance text-muted-foreground">
-          Set up your workspace in under a minute. Free for teams of three —
-          upgrade when the roadmap outgrows you.
+          Configurá tu espacio de trabajo en menos de un minuto. Acceso completo e ilimitado para todo el equipo.
         </p>
-        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
+        <div className="mt-8">
           <Button size="lg" className="h-10 px-5" asChild>
-            <Link href="/sign-up">
-              Get started for free
+            <Link href="/onboarding">
+              Ingresar al panel
               <ArrowRight className="size-4" />
             </Link>
-          </Button>
-          <Button size="lg" variant="ghost" className="h-10 px-5" asChild>
-            <Link href="/pricing">Compare plans</Link>
           </Button>
         </div>
       </div>

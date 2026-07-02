@@ -47,16 +47,16 @@ export function IssueProjectCyclePanel({ issue, team }: IssueDetailSlotProps) {
   }) => {
     updateIssue({ issueId: issue._id, ...patch }).catch((error: unknown) => {
       toast.error(
-        error instanceof Error ? error.message : "Failed to update issue"
+        error instanceof Error ? error.message : "Error al actualizar la tarea"
       );
     });
   };
 
   return (
     <div className="flex flex-col gap-3">
-      <h3 className="text-xs font-medium text-muted-foreground">Planning</h3>
+      <h3 className="text-xs font-medium text-muted-foreground">Planificación</h3>
 
-      <PropertyRow label="Project">
+      <PropertyRow label="Proyecto">
         <Select
           value={issue.projectId ?? NONE}
           onValueChange={(value) =>
@@ -69,11 +69,11 @@ export function IssueProjectCyclePanel({ issue, team }: IssueDetailSlotProps) {
             size="sm"
             className="w-36 gap-1.5 border-none shadow-none"
           >
-            <SelectValue placeholder="No project" />
+            <SelectValue placeholder="Sin proyecto" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={NONE}>
-              <span className="text-muted-foreground">No project</span>
+              <span className="text-muted-foreground">Sin proyecto</span>
             </SelectItem>
             {projects?.map((project) => (
               <SelectItem key={project._id} value={project._id}>
@@ -90,7 +90,7 @@ export function IssueProjectCyclePanel({ issue, team }: IssueDetailSlotProps) {
         </Select>
       </PropertyRow>
 
-      <PropertyRow label="Cycle">
+      <PropertyRow label="Ciclo">
         <Select
           value={issue.cycleId ?? NONE}
           onValueChange={(value) =>
@@ -103,17 +103,17 @@ export function IssueProjectCyclePanel({ issue, team }: IssueDetailSlotProps) {
             size="sm"
             className="w-36 gap-1.5 border-none shadow-none"
           >
-            <SelectValue placeholder="No cycle" />
+            <SelectValue placeholder="Sin ciclo" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={NONE}>
-              <span className="text-muted-foreground">No cycle</span>
+              <span className="text-muted-foreground">Sin ciclo</span>
             </SelectItem>
             {cycles?.map((cycle) => (
               <SelectItem key={cycle._id} value={cycle._id}>
                 {cycleDisplayName(cycle)}
                 {isCurrentCycle(cycle) && (
-                  <span className="text-xs text-emerald-500">Current</span>
+                  <span className="text-xs text-emerald-500">Actual</span>
                 )}
               </SelectItem>
             ))}

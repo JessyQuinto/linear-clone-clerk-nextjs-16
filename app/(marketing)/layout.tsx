@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Show } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/shell/theme-toggle";
 
 /**
  * Marketing layout — Track F owns the landing page content, Track E owns
@@ -17,25 +18,23 @@ export default function MarketingLayout({
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2 font-semibold">
             <span className="flex size-6 items-center justify-center rounded bg-primary text-xs font-bold text-primary-foreground">
-              V
+              P
             </span>
-            Vector
+            PANEL STYT
           </Link>
           <nav className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/pricing">Pricing</Link>
-            </Button>
+            <ThemeToggle />
             <Show when="signed-out">
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/sign-in">Log in</Link>
+                <Link href="/sign-in">Iniciar sesión</Link>
               </Button>
               <Button size="sm" asChild>
-                <Link href="/sign-up">Sign up</Link>
+                <Link href="/sign-up">Registrarse</Link>
               </Button>
             </Show>
             <Show when="signed-in">
               <Button size="sm" asChild>
-                <Link href="/onboarding">Open app</Link>
+                <Link href="/onboarding">Abrir app</Link>
               </Button>
             </Show>
           </nav>

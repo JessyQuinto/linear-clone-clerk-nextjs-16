@@ -12,39 +12,39 @@ import { Section, SectionHeading } from "@/components/marketing/section";
 const FEATURES: { icon: LucideIcon; title: string; description: string }[] = [
   {
     icon: Search,
-    title: "Full-text search",
+    title: "Búsqueda completa",
     description:
-      "Find any issue by title or description in milliseconds, scoped to your workspace.",
+      "Encontrá cualquier tarea por título o descripción en milisegundos, dentro de tu espacio.",
   },
   {
     icon: ListFilter,
-    title: "Saved views",
+    title: "Vistas guardadas",
     description:
-      "Slice the backlog by status, assignee, label, or cycle — then save the view for the team.",
+      "Filtrá el backlog por estado, responsable o etiqueta, y guardá la vista para tu equipo.",
   },
   {
     icon: Paperclip,
-    title: "Attachments",
+    title: "Archivos adjuntos",
     description:
-      "Drop logs, screenshots, and specs straight onto the issue. Stored alongside the work.",
+      "Arrastrá logs, capturas de pantalla y especificaciones directamente en la tarea.",
   },
   {
     icon: AtSign,
-    title: "Mentions & threads",
+    title: "Menciones e hilos",
     description:
-      "Pull the right person into the conversation with @mentions that notify instantly.",
+      "Sumá a la persona correcta al debate con menciones que notifican de inmediato.",
   },
   {
     icon: Users,
-    title: "Live presence",
+    title: "Presencia en vivo",
     description:
-      "See who's viewing an issue right now, so you never collide on an edit or a triage call.",
+      "Mirá quién está viendo una tarea en tiempo real para no solapar ediciones ni decisiones.",
   },
   {
     icon: Boxes,
-    title: "Multi-team workspaces",
+    title: "Espacios multi-equipo",
     description:
-      "Each team gets its own key, board, and cycles — ENG-142 means the same thing to everyone.",
+      "Cada equipo tiene su propia clave, tablero y ciclos de trabajo independiente.",
   },
 ];
 
@@ -52,9 +52,9 @@ export function FeatureGrid() {
   return (
     <Section>
       <SectionHeading
-        eyebrow="05 · Everything else"
-        title="All the table stakes, none of the bloat"
-        lede="The features you expect from a serious tracker — built in, fast, and out of your way."
+        eyebrow="05 · Todo lo demás"
+        title="Toda la potencia, nada de relleno"
+        lede="Las herramientas que esperás de un gestor profesional — integradas, veloces y listas para usar."
         align="center"
       />
       <div className="mt-14 grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-2 lg:grid-cols-3">

@@ -79,7 +79,7 @@ export function CreateProjectDialog({
         targetDate: inputDateToMs(targetDate, "end"),
         color,
       });
-      toast.success("Project created");
+      toast.success("Proyecto creado");
       onOpenChange(false);
       reset();
       if (params.orgSlug) {
@@ -87,7 +87,7 @@ export function CreateProjectDialog({
       }
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to create project"
+        error instanceof Error ? error.message : "Error al crear el proyecto"
       );
     } finally {
       setSubmitting(false);
@@ -99,13 +99,13 @@ export function CreateProjectDialog({
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle className="text-sm font-medium text-muted-foreground">
-            New project
+            Nuevo proyecto
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-3">
           <Input
             autoFocus
-            placeholder="Project name"
+            placeholder="Nombre del proyecto"
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
@@ -116,7 +116,7 @@ export function CreateProjectDialog({
             className="border-none px-0 text-lg font-medium shadow-none focus-visible:ring-0 dark:bg-transparent"
           />
           <Textarea
-            placeholder="Add description…"
+            placeholder="Agregar descripción…"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="min-h-20 resize-none border-none px-0 shadow-none focus-visible:ring-0 dark:bg-transparent"
@@ -145,11 +145,11 @@ export function CreateProjectDialog({
               }
             >
               <SelectTrigger size="sm" className="w-auto gap-1.5">
-                <SelectValue placeholder="Lead" />
+                <SelectValue placeholder="Responsable" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={NO_LEAD}>
-                  <span className="text-muted-foreground">No lead</span>
+                  <span className="text-muted-foreground">Sin responsable</span>
                 </SelectItem>
                 {members?.map((member) => (
                   <SelectItem key={member.userId} value={member.userId}>
@@ -165,7 +165,7 @@ export function CreateProjectDialog({
                 type="date"
                 value={targetDate}
                 onChange={(e) => setTargetDate(e.target.value)}
-                aria-label="Target date"
+                aria-label="Fecha objetivo"
                 className="bg-transparent text-xs text-foreground outline-none [color-scheme:light] dark:[color-scheme:dark]"
               />
             </div>
@@ -190,14 +190,14 @@ export function CreateProjectDialog({
         </div>
         <div className="flex justify-end gap-2">
           <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
-            Cancel
+            Cancelar
           </Button>
           <Button
             size="sm"
             disabled={!name.trim() || submitting}
             onClick={() => void handleSubmit()}
           >
-            Create project
+            Crear proyecto
           </Button>
         </div>
       </DialogContent>

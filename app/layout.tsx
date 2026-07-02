@@ -16,11 +16,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Vector — Plan. Build. Ship.",
-    template: "%s · Vector",
+    default: "PANEL STYT — Planificá. Desarrollá. Entregá.",
+    template: "%s · PANEL STYT",
   },
   description:
-    "Vector is the issue tracker built for speed. Plan projects, run cycles, and ship with your team — with an AI agent on call.",
+    "PANEL STYT es el gestor de tareas diseñado para la velocidad. Planificá proyectos, ejecutá ciclos y entregá con tu equipo — con un agente de IA disponible.",
 };
 
 export default function RootLayout({
@@ -30,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >

@@ -1,15 +1,8 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
-
 /**
- * Cosmetic plan gate for AI surfaces via Clerk's `has` check.
- * Convex (`hasAiAccess`) is the authoritative enforcement.
+ * AI access is always granted — no plan gating.
  */
 export function useAiAccess(): { isLoaded: boolean; hasAccess: boolean } {
-  const { isLoaded, has } = useAuth();
-  return {
-    isLoaded,
-    hasAccess: isLoaded ? (has?.({ feature: "ai_agent" }) ?? false) : false,
-  };
+  return { isLoaded: true, hasAccess: true };
 }

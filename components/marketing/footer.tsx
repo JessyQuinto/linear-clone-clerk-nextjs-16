@@ -5,21 +5,20 @@ const COLUMNS: {
   links: { label: string; href: string }[];
 }[] = [
   {
-    heading: "Product",
+    heading: "Producto",
     links: [
-      { label: "Issues", href: "/#issues" },
-      { label: "Board & Cycles", href: "/#cycles" },
-      { label: "AI Agent", href: "/#ai" },
-      { label: "Keyboard-first", href: "/#keyboard" },
-      { label: "Pricing", href: "/pricing" },
+      { label: "Tareas", href: "/#issues" },
+      { label: "Tableros y Ciclos", href: "/#cycles" },
+      { label: "Agente IA", href: "/#ai" },
+      { label: "Atajos de Teclado", href: "/#keyboard" },
     ],
   },
   {
-    heading: "Get started",
+    heading: "Acceso",
     links: [
-      { label: "Sign up", href: "/sign-up" },
-      { label: "Log in", href: "/sign-in" },
-      { label: "Open app", href: "/onboarding" },
+      { label: "Registrarse", href: "/sign-up" },
+      { label: "Iniciar sesión", href: "/sign-in" },
+      { label: "Abrir panel", href: "/onboarding" },
     ],
   },
 ];
@@ -32,14 +31,12 @@ export function Footer() {
           <div className="max-w-xs">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <span className="flex size-6 items-center justify-center rounded bg-primary text-xs font-bold text-primary-foreground">
-                V
+                P
               </span>
-              Vector
+              PANEL STYT
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              The issue tracker built for speed. Plan, track, and ship with
-              your whole team — and an AI agent — in one keyboard-first
-              workspace.
+              El gestor de tareas diseñado para la velocidad. Planificá, hacé seguimiento y entregá proyectos con tu equipo asistido por IA.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-10 sm:gap-16">
@@ -63,11 +60,11 @@ export function Footer() {
         </div>
         <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t pt-6 sm:flex-row sm:items-center">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Vector. All systems operational.
+            © {new Date().getFullYear()} PANEL STYT. Todos los sistemas operando.
           </p>
           <p className="flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
             <span className="size-1.5 rounded-full bg-emerald-500" />
-            Realtime sync · 99.99% uptime
+            Sincronización en tiempo real · 99.99% disponibilidad
           </p>
         </div>
       </div>

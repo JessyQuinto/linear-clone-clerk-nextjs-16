@@ -10,20 +10,18 @@ import { Button } from "@/components/ui/button";
 import { AiComposer } from "./composer";
 import { convexErrorMessage } from "./convex-error";
 import { AiConversation } from "./conversation";
-import { QuotaPill } from "./quota-pill";
 import { ThreadList } from "./thread-list";
-import { AiUpgradeCta } from "./upgrade-cta";
 import { useAiAccess } from "./use-ai-access";
 
 const SUGGESTIONS = [
-  "What should I work on next?",
-  "Write a standup report for the last 24 hours",
-  "Summarize the current cycle",
-  "Find issues that look like duplicates",
+  "¿En qué debería trabajar a continuación?",
+  "Escribir un reporte de standup para las últimas 24 horas",
+  "Resumir el ciclo actual",
+  "Buscar tareas que parezcan duplicadas",
 ];
 
 export function AiAgentPage() {
-  const { isLoaded, hasAccess } = useAiAccess();
+  const { isLoaded } = useAiAccess();
 
   if (!isLoaded) {
     return (
@@ -32,15 +30,11 @@ export function AiAgentPage() {
       </div>
     );
   }
-  if (!hasAccess) {
-    return <AiUpgradeCta />;
-  }
   return <AiWorkspace />;
 }
 
 function AiWorkspace() {
   const threads = useQuery(api.agent.chat.listThreads);
-  const quota = useQuery(api.agent.chat.quota);
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
 
   const createThread = useMutation(api.agent.chat.createThread);
@@ -55,23 +49,13 @@ function AiWorkspace() {
     });
   });
 
-  // Kick the semantic-index backfill once per visit (idempotent no-op when
-  // every issue already has an embedding).
   const backfillRequested = useRef(false);
   useEffect(() => {
     if (!backfillRequested.current) {
       backfillRequested.current = true;
-      ensureOrgEmbeddings({}).catch(() => {
-        // Non-critical background task.
-      });
+      ensureOrgEmbeddings({}).catch(() => {});
     }
   }, [ensureOrgEmbeddings]);
-
-  const quotaExhausted =
-    quota !== undefined &&
-    quota.hasAccess &&
-    !quota.unlimited &&
-    quota.remaining <= 0;
 
   const send = async (prompt: string) => {
     try {
@@ -83,7 +67,7 @@ function AiWorkspace() {
       await sendMessage({ threadId, prompt });
     } catch (error) {
       toast.error(
-        convexErrorMessage(error, "Failed to send message. Please try again.")
+        convexErrorMessage(error, "Error al enviar el mensaje. Por favor intentá de nuevo.")
       );
       throw error;
     }
@@ -98,7 +82,7 @@ function AiWorkspace() {
       })
       .catch((error: unknown) => {
         toast.error(
-          convexErrorMessage(error, "Failed to delete conversation.")
+          convexErrorMessage(error, "Error al eliminar la conversación.")
         );
       });
   };
@@ -107,10 +91,7 @@ function AiWorkspace() {
     <>
       <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
         <Bot className="size-4 text-primary" />
-        <h1 className="text-sm font-medium">AI Agent</h1>
-        <div className="ml-auto">
-          <QuotaPill quota={quota} />
-        </div>
+        <h1 className="text-sm font-medium">Agente IA</h1>
       </header>
       <div className="flex min-h-0 flex-1">
         <ThreadList
@@ -124,13 +105,9 @@ function AiWorkspace() {
           {selectedThreadId ? (
             <AiConversation threadId={selectedThreadId} />
           ) : (
-            <EmptyState onSuggestion={send} disabled={quotaExhausted} />
+            <EmptyState onSuggestion={send} />
           )}
-          <AiComposer
-            disabled={quotaExhausted}
-            disabledReason="Daily AI message limit reached — upgrade to Enterprise for unlimited messages"
-            onSend={send}
-          />
+          <AiComposer disabled={false} onSend={send} />
         </main>
       </div>
     </>
@@ -139,10 +116,8 @@ function AiWorkspace() {
 
 function EmptyState({
   onSuggestion,
-  disabled,
 }: {
   onSuggestion: (prompt: string) => Promise<void>;
-  disabled: boolean;
 }) {
   return (
     <div className="flex flex-1 items-center justify-center p-8">
@@ -151,10 +126,10 @@ function EmptyState({
           <Sparkles className="size-5 text-primary" />
         </div>
         <div className="flex flex-col gap-1">
-          <h2 className="text-base font-semibold">Ask Vector</h2>
+          <h2 className="text-base font-semibold">Preguntale a PANEL STYT</h2>
           <p className="text-sm text-muted-foreground">
-            Vector knows your teams, issues, projects and cycles — and can
-            create or update issues for you.
+            PANEL STYT conoce tus equipos, tareas, proyectos y ciclos — y puede
+            crear o actualizar tareas por vos.
           </p>
         </div>
         <div className="flex w-full flex-col gap-1.5">
@@ -163,7 +138,6 @@ function EmptyState({
               key={suggestion}
               variant="outline"
               size="sm"
-              disabled={disabled}
               className="justify-start font-normal text-muted-foreground"
               onClick={() => void onSuggestion(suggestion)}
             >

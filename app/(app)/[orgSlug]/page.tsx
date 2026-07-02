@@ -34,13 +34,13 @@ export default function WorkspaceHomePage() {
     try {
       const result = await seedDemoData({});
       toast.success(
-        `Demo workspace ready — ${result.teams} teams, ${result.issues} issues, ${result.projects} projects.`
+        `Espacio de trabajo demo listo — ${result.teams} equipos, ${result.issues} tareas, ${result.projects} proyectos.`
       );
       // Keep the spinner on; the reactive teams query redirects to the first team.
     } catch (error) {
       setSeeding(false);
       toast.error(
-        error instanceof Error ? error.message : "Seeding demo data failed."
+        error instanceof Error ? error.message : "Error al sembrar datos de prueba."
       );
     }
   };
@@ -56,9 +56,9 @@ export default function WorkspaceHomePage() {
   if (teams.length === 0) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
-        <h2 className="text-lg font-medium">Welcome to Vector</h2>
+        <h2 className="text-lg font-medium">Te damos la bienvenida a PANEL STYT</h2>
         <p className="max-w-sm text-sm text-muted-foreground">
-          Create your first team from the sidebar to start tracking issues.
+          Creá tu primer equipo desde la barra lateral para empezar a hacer seguimiento de tareas.
         </p>
         {isAdmin && (
           <>
@@ -73,10 +73,10 @@ export default function WorkspaceHomePage() {
               ) : (
                 <Sparkles className="size-4" />
               )}
-              {seeding ? "Seeding…" : "Seed demo data"}
+              {seeding ? "Sembrando…" : "Sembrar datos demo"}
             </Button>
             <p className="text-xs text-muted-foreground">
-              Populates 3 teams with issues, projects, cycles and labels.
+              Puebla 3 equipos con tareas, proyectos, ciclos y etiquetas.
             </p>
           </>
         )}

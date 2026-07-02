@@ -50,19 +50,21 @@ const builtinCommands: AppCommand[] = [
     group: "Preferences",
     run: ({ toggleTheme }) => toggleTheme(),
   },
+  {
+    id: "go-members-settings",
+    label: "Go to members settings",
+    group: "Settings",
+    run: ({ push, orgSlug }) => push(`/${orgSlug}/settings/members`),
+  },
 ];
 
 // ── Track registrations (append imports + spread below) ──────────────────
-// Example: import { boardCommands } from "@/components/board/commands";
 import { boardViewCommands } from "@/components/board/commands";
-import { billingCommands } from "@/components/billing/commands";
 import { aiCommands } from "@/components/ai/commands";
 
 export const appCommands: AppCommand[] = [
   ...builtinCommands,
-  // ...boardCommands,
   ...boardViewCommands,
   ...projectCycleCommands,
-  ...billingCommands,
   ...aiCommands,
 ];

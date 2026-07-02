@@ -47,7 +47,7 @@ function ProjectsPageInner() {
     <>
       <header className="flex h-12 shrink-0 items-center justify-between border-b px-4">
         <div className="flex items-center gap-2 text-sm">
-          <span className="font-medium">Projects</span>
+          <span className="font-medium">Productos</span>
           {projects !== undefined && (
             <span className="text-xs text-muted-foreground">
               {projects.length}
@@ -56,7 +56,7 @@ function ProjectsPageInner() {
         </div>
         <Button size="sm" variant="outline" onClick={() => setManualOpen(true)}>
           <Plus className="size-4" />
-          New project
+          Nuevo producto
         </Button>
       </header>
 
@@ -68,24 +68,24 @@ function ProjectsPageInner() {
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
           <FolderKanban className="size-8 text-muted-foreground/50" />
           <div>
-            <p className="text-sm font-medium">No projects yet</p>
+            <p className="text-sm font-medium">No hay productos aún</p>
             <p className="text-xs text-muted-foreground">
-              Projects group issues across teams toward a shared goal.
+              Los productos agrupan iniciativas y soluciones bajo un objetivo común.
             </p>
           </div>
           <Button size="sm" onClick={() => setManualOpen(true)}>
             <Plus className="size-4" />
-            Create project
+            Crear producto
           </Button>
         </div>
       ) : (
         <ScrollArea className="flex-1">
           <div className="flex h-8 items-center gap-3 border-b bg-muted/50 px-4 text-xs text-muted-foreground">
-            <span className="flex-1 pl-8">Name</span>
-            <span className="hidden w-16 text-right sm:block">Issues</span>
-            <span className="hidden w-44 md:block">Progress</span>
-            <span className="hidden w-14 text-right lg:block">Target</span>
-            <span className="w-5 text-right">Lead</span>
+            <span className="flex-1 pl-8">Nombre</span>
+            <span className="hidden w-16 text-right sm:block">Slices / Tareas</span>
+            <span className="hidden w-44 md:block">Avance</span>
+            <span className="hidden w-14 text-right lg:block">Objetivo</span>
+            <span className="w-5 text-right">Líder</span>
           </div>
           {projects.map((project) => (
             <ProjectRow key={project._id} project={project} />

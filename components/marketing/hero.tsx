@@ -1,4 +1,4 @@
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/marketing/kbd";
@@ -18,43 +18,26 @@ export function Hero() {
       />
 
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center px-6 pt-20 text-center md:pt-28">
-        <Link
-          href="/pricing"
-          className="group flex items-center gap-2 rounded-full border bg-background/60 py-1 pr-3 pl-1.5 text-xs text-muted-foreground backdrop-blur transition-colors hover:border-ring/60 hover:text-foreground"
-        >
-          <span className="flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground">
-            <Sparkles className="size-2.5" />
-            New
-          </span>
-          The AI agent joins your team on Pro
-          <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
-        </Link>
-
         <h1 className="mt-8 max-w-3xl text-5xl font-semibold tracking-tighter text-balance md:text-7xl">
-          The issue tracker built for speed
+          El gestor de tareas diseñado para la velocidad
         </h1>
         <p className="mt-6 max-w-xl text-base text-balance text-muted-foreground md:text-lg">
-          Vector is how fast product teams plan, track, and ship — issues,
-          boards, and cycles in a keyboard-first workspace, with an AI agent
-          that handles the busywork.
+          PANEL STYT es la plataforma interna para planificar, hacer seguimiento y entregar proyectos de manera ágil — con tareas, tableros y ciclos en un espacio optimizado para teclado y asistido por IA.
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
           <Button size="lg" className="h-10 px-5" asChild>
-            <Link href="/sign-up">
-              Start building — free
+            <Link href="/onboarding">
+              Ingresar al panel
               <ArrowRight className="size-4" />
             </Link>
           </Button>
-          <Button size="lg" variant="outline" className="h-10 px-5" asChild>
-            <Link href="/pricing">View pricing</Link>
-          </Button>
         </div>
         <p className="mt-4 flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
-          Free for teams of 3 · No credit card · Press
+          Espacio de trabajo interno · Presioná
           <Kbd>⌘</Kbd>
           <Kbd>K</Kbd>
-          anywhere
+          en cualquier lado
         </p>
       </div>
 

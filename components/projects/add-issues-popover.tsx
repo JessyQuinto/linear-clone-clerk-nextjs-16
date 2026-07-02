@@ -25,7 +25,7 @@ export function AddIssuesPopover({
   candidates,
   teamKeyFor,
   onAdd,
-  emptyText = "No issues to add.",
+  emptyText = "No hay tareas para agregar.",
 }: {
   candidates: Doc<"issues">[] | undefined;
   teamKeyFor: (teamId: Id<"teams">) => string;
@@ -39,12 +39,12 @@ export function AddIssuesPopover({
       <PopoverTrigger asChild>
         <Button size="sm" variant="outline">
           <Plus className="size-4" />
-          Add issues
+          Agregar tareas
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-96 p-0">
         <Command>
-          <CommandInput placeholder="Add existing issues…" />
+          <CommandInput placeholder="Buscar tareas existentes…" />
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
             {candidates?.map((issue) => {

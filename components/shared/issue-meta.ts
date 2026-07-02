@@ -4,20 +4,20 @@ export type IssueStatus = Doc<"issues">["status"];
 export type IssuePriority = Doc<"issues">["priority"];
 
 export const STATUSES: { value: IssueStatus; label: string }[] = [
-  { value: "backlog", label: "Backlog" },
-  { value: "todo", label: "Todo" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "in_review", label: "In Review" },
-  { value: "done", label: "Done" },
-  { value: "canceled", label: "Canceled" },
+  { value: "backlog", label: "Pendiente" },
+  { value: "todo", label: "Por hacer" },
+  { value: "in_progress", label: "En progreso" },
+  { value: "in_review", label: "En revisión" },
+  { value: "done", label: "Completado" },
+  { value: "canceled", label: "Cancelado" },
 ];
 
 export const PRIORITIES: { value: IssuePriority; label: string }[] = [
-  { value: "none", label: "No priority" },
-  { value: "urgent", label: "Urgent" },
-  { value: "high", label: "High" },
-  { value: "medium", label: "Medium" },
-  { value: "low", label: "Low" },
+  { value: "none", label: "Sin prioridad" },
+  { value: "urgent", label: "Urgente" },
+  { value: "high", label: "Alta" },
+  { value: "medium", label: "Media" },
+  { value: "low", label: "Baja" },
 ];
 
 export function statusLabel(status: IssueStatus): string {

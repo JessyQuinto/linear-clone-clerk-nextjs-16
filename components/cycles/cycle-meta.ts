@@ -11,7 +11,7 @@ export type CycleStatus = "current" | "upcoming" | "completed";
 
 /** "Cycle 3" or the custom name when one is set. */
 export function cycleDisplayName(cycle: CycleLike): string {
-  return cycle.name ?? `Cycle ${cycle.number}`;
+  return cycle.name ?? `Ciclo ${cycle.number}`;
 }
 
 export function cycleStatus(cycle: CycleLike, now = Date.now()): CycleStatus {
@@ -29,9 +29,9 @@ export function isCurrentCycle(cycle: CycleLike, now = Date.now()): boolean {
 }
 
 export const CYCLE_STATUS_LABELS: Record<CycleStatus, string> = {
-  current: "Current",
-  upcoming: "Upcoming",
-  completed: "Completed",
+  current: "Actual",
+  upcoming: "Próximo",
+  completed: "Completado",
 };
 
 /** Whole days until the cycle ends (0 when it has ended). */

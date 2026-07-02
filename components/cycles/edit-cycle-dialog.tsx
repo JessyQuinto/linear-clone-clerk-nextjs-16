@@ -53,11 +53,11 @@ export function EditCycleDialog({
         startDate: startMs,
         endDate: endMs,
       });
-      toast.success("Cycle updated");
+      toast.success("Ciclo actualizado");
       onOpenChange(false);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to update cycle"
+        error instanceof Error ? error.message : "Error al actualizar el ciclo"
       );
     } finally {
       setSubmitting(false);
@@ -69,13 +69,13 @@ export function EditCycleDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-sm font-medium text-muted-foreground">
-            Edit cycle {cycle.number}
+            Editar ciclo {cycle.number}
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <Input
             autoFocus
-            placeholder={`Cycle ${cycle.number}`}
+            placeholder={`Ciclo ${cycle.number}`}
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
@@ -87,42 +87,42 @@ export function EditCycleDialog({
           />
           <div className="flex flex-wrap items-end gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-muted-foreground">Start</Label>
+              <Label className="text-xs text-muted-foreground">Inicio</Label>
               <input
                 type="date"
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
-                aria-label="Start date"
+                aria-label="Fecha de inicio"
                 className="h-8 rounded-md border bg-transparent px-2 text-xs text-foreground outline-none [color-scheme:light] dark:[color-scheme:dark]"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-muted-foreground">End</Label>
+              <Label className="text-xs text-muted-foreground">Fin</Label>
               <input
                 type="date"
                 value={end}
                 onChange={(e) => setEnd(e.target.value)}
-                aria-label="End date"
+                aria-label="Fecha de fin"
                 className="h-8 rounded-md border bg-transparent px-2 text-xs text-foreground outline-none [color-scheme:light] dark:[color-scheme:dark]"
               />
             </div>
           </div>
           {!datesValid && (
             <p className="text-xs text-destructive">
-              End date must be after the start date.
+              La fecha de fin debe ser posterior a la fecha de inicio.
             </p>
           )}
         </div>
         <div className="flex justify-end gap-2">
           <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
-            Cancel
+            Cancelar
           </Button>
           <Button
             size="sm"
             disabled={!datesValid || submitting}
             onClick={() => void handleSubmit()}
           >
-            Save changes
+            Guardar cambios
           </Button>
         </div>
       </DialogContent>

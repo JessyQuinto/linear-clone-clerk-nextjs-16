@@ -14,35 +14,31 @@ export function FeaturesAi() {
       <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
         <MockAiChat className="order-last lg:order-first" />
         <div>
-          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
-            <span className="size-1.5 rounded-full bg-emerald-500" />
-            Included in Pro & Enterprise
-          </div>
           <SectionHeading
-            eyebrow="03 · AI Agent"
-            title="An AI agent on the roster"
-            lede="Vector's agent works inside your workspace with org-scoped tools — it files issues, summarizes cycles, drafts standups, and catches duplicates before they ship."
+            eyebrow="03 · Agente IA"
+            title="Un agente de IA en tu equipo"
+            lede="El agente de PANEL STYT trabaja dentro de tu espacio con herramientas con permisos de la organización — crea tareas, resume ciclos y detecta duplicados al instante."
           />
           <div className="mt-10 grid gap-7 sm:grid-cols-2">
             <FeatureBullet
               icon={MessagesSquare}
-              title="Chat with context"
-              description="It knows your teams, cycles, and backlog — answers come from your data, not the void."
+              title="Chat con contexto"
+              description="Conoce tus equipos, ciclos y backlog — las respuestas provienen de tus datos reales."
             />
             <FeatureBullet
               icon={Workflow}
-              title="Tools, not just talk"
-              description="Creates, updates, and searches issues with the same permission checks as any member."
+              title="Acciones, no solo palabras"
+              description="Crea, actualiza y busca tareas con los mismos permisos que cualquier miembro de la organización."
             />
             <FeatureBullet
               icon={FileText}
-              title="Reports on demand"
-              description="Standups and cycle summaries written from real activity, ready to paste anywhere."
+              title="Reportes bajo demanda"
+              description="Genera resúmenes de ciclos y reportes de estado a partir de la actividad real del equipo."
             />
             <FeatureBullet
               icon={Crosshair}
-              title="Duplicate radar"
-              description="Semantic search over every issue flags lookalikes the moment something is filed."
+              title="Detección de duplicados"
+              description="Búsqueda semántica inteligente para alertar sobre tareas duplicadas al instante de crearse."
             />
           </div>
         </div>

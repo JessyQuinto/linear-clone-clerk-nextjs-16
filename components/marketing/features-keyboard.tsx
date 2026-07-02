@@ -3,12 +3,12 @@ import { MockCommandPalette } from "@/components/marketing/mock-command-palette"
 import { Section, SectionHeading } from "@/components/marketing/section";
 
 const SHORTCUTS: { keys: string[]; label: string }[] = [
-  { keys: ["⌘", "K"], label: "Command palette" },
-  { keys: ["C"], label: "Create issue" },
-  { keys: ["A"], label: "Assign" },
-  { keys: ["L"], label: "Add label" },
-  { keys: ["B"], label: "Open board" },
-  { keys: ["⌘", "J"], label: "Ask the agent" },
+  { keys: ["⌘", "K"], label: "Paleta de comandos" },
+  { keys: ["C"], label: "Crear tarea" },
+  { keys: ["A"], label: "Asignar responsable" },
+  { keys: ["L"], label: "Agregar etiqueta" },
+  { keys: ["B"], label: "Abrir tablero" },
+  { keys: ["⌘", "J"], label: "Consultar al agente" },
 ];
 
 export function FeaturesKeyboard() {
@@ -17,9 +17,9 @@ export function FeaturesKeyboard() {
       <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
         <div>
           <SectionHeading
-            eyebrow="04 · Keyboard-first"
-            title="Your hands never leave the keyboard"
-            lede="Everything in Vector is a command. One palette, single-key shortcuts, and zero context switches between thinking and doing."
+            eyebrow="04 · Optimizado para Teclado"
+            title="Tus manos nunca dejan el teclado"
+            lede="Todo en PANEL STYT es un comando. Una sola paleta, atajos rápidos de una tecla y cero fricción entre idear y ejecutar."
           />
           <div className="mt-10 space-y-2.5">
             {SHORTCUTS.map((shortcut) => (

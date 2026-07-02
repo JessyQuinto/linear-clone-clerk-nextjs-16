@@ -7,13 +7,11 @@ import { FeaturesIssues } from "@/components/marketing/features-issues";
 import { FeaturesKeyboard } from "@/components/marketing/features-keyboard";
 import { Footer } from "@/components/marketing/footer";
 import { Hero } from "@/components/marketing/hero";
-import { LogoCloud } from "@/components/marketing/logo-cloud";
-import { Testimonials } from "@/components/marketing/testimonials";
 
 export const metadata: Metadata = {
-  title: "Vector — The issue tracker built for speed",
+  title: "PANEL STYT — El gestor de tareas diseñado para la velocidad",
   description:
-    "Plan, track, and ship with issues, boards, and cycles in a keyboard-first workspace — with an AI agent that handles the busywork. Free for teams of 3.",
+    "Planificá, hacé seguimiento y entregá con tareas, tableros y ciclos en un espacio de trabajo diseñado para teclado — con un agente de IA que se encarga del trabajo rutinario.",
 };
 
 export default function LandingPage() {
@@ -21,13 +19,11 @@ export default function LandingPage() {
     <>
       <main>
         <Hero />
-        <LogoCloud />
         <FeaturesIssues />
         <FeaturesBoard />
         <FeaturesAi />
         <FeaturesKeyboard />
         <FeatureGrid />
-        <Testimonials />
         <Cta />
       </main>
       <Footer />

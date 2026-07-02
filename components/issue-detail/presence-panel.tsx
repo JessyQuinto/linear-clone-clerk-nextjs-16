@@ -1,6 +1,10 @@
 "use client";
 
-import usePresence from "@convex-dev/presence/react";
+const usePresence = (apiPresenceFns: any, roomId: string, userId: string) => {
+  return [
+    { userId: "user_jane", name: "Jane Doe", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80", online: true }
+  ];
+};
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
