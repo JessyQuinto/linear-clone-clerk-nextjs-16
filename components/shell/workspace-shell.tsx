@@ -8,6 +8,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { CommandProvider } from "@/components/commands/command-provider";
 import { AppSidebar } from "./app-sidebar";
+import { SidebarProvider } from "./sidebar-context";
 
 function FullScreenLoader({ label }: { label: string }) {
   return (
@@ -85,13 +86,15 @@ export function WorkspaceShell({
   }
 
   return (
-    <CommandProvider>
-      <div className="flex h-dvh overflow-hidden">
-        <AppSidebar />
-        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-          {children}
-        </main>
-      </div>
-    </CommandProvider>
+    <SidebarProvider>
+      <CommandProvider>
+        <div className="flex h-dvh overflow-hidden">
+          <AppSidebar />
+          <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+            {children}
+          </main>
+        </div>
+      </CommandProvider>
+    </SidebarProvider>
   );
 }

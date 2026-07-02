@@ -1,34 +1,26 @@
 "use client";
 
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
-import { useQuery } from "convex/react";
 import {
   Bot,
-  Box,
-  ChevronDown,
-  Plus,
+  LayoutDashboard,
+  FolderKanban,
   RefreshCcw,
   Search,
   SquarePen,
-  Wrench,
-  ShieldCheck,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { ReactNode, useState } from "react";
-import { api } from "@/convex/_generated/api";
+import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useCommands } from "@/components/commands/command-provider";
-import { CreateTeamDialog } from "@/components/teams/create-team-dialog";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
+import { useSidebar } from "./sidebar-context";
 
 interface NavLinkProps {
   href: string;
@@ -59,120 +51,98 @@ function NavLink({ href, exact, icon, children }: NavLinkProps) {
 
 export function AppSidebar() {
   const params = useParams<{ orgSlug: string }>();
-  const pathname = usePathname();
-  const teams = useQuery(api.teams.list);
   const { openCreateIssue, openPalette } = useCommands();
-  const [createTeamOpen, setCreateTeamOpen] = useState(false);
   const base = `/${params.orgSlug}`;
+  const { isCollapsed, setIsCollapsed } = useSidebar();
 
   return (
-    <aside className="flex w-60 shrink-0 flex-col border-r bg-sidebar">
-      <div className="flex items-center justify-between gap-2 p-3">
-        <OrganizationSwitcher
-          hidePersonal
-          afterSelectOrganizationUrl="/:slug"
-          afterCreateOrganizationUrl="/:slug"
-          appearance={{
-            elements: {
-              rootBox: "min-w-0",
-              organizationSwitcherTrigger: "max-w-44",
-            },
-          }}
-        />
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-7"
-              onClick={openCreateIssue}
-              aria-label="Nueva tarea"
-            >
-              <SquarePen className="size-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right">Nueva tarea (C)</TooltipContent>
-        </Tooltip>
-      </div>
-
-      <div className="px-3 pb-2">
-        <button
-          onClick={openPalette}
-          className="flex h-7 w-full items-center gap-2 rounded-md border bg-background px-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <Search className="size-3.5" />
-          Buscar…
-          <kbd className="ml-auto rounded border bg-muted px-1 font-mono text-[10px]">
-            ⌘K
-          </kbd>
-        </button>
-      </div>
-
-      <ScrollArea className="flex-1 px-3">
-        <nav className="flex flex-col gap-0.5 pb-2">
-          <NavLink href={base} exact icon={<Box className="size-4" />}>
-            Espacio de trabajo
-          </NavLink>
-          <NavLink href={`${base}/projects`} icon={<Box className="size-4" />}>
-            Proyectos
-          </NavLink>
-          <NavLink href={`${base}/cycles`} icon={<RefreshCcw className="size-4" />}>
-            Ciclos
-          </NavLink>
-          <NavLink href={`${base}/ai`} icon={<Bot className="size-4" />}>
-            Agente IA
-          </NavLink>
-        </nav>
-
-        <Collapsible defaultOpen className="pb-4">
-          <div className="flex items-center justify-between">
-            <CollapsibleTrigger className="flex items-center gap-1 py-1 text-xs font-medium text-muted-foreground hover:text-foreground">
-              Tus equipos
-              <ChevronDown className="size-3" />
-            </CollapsibleTrigger>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-5"
-              onClick={() => setCreateTeamOpen(true)}
-              aria-label="Crear equipo"
-            >
-              <Plus className="size-3.5" />
-            </Button>
-          </div>
-          <CollapsibleContent className="flex flex-col gap-0.5 pt-1">
-            {teams?.map((team) => (
-              <NavLink
-                key={team._id}
-                href={`${base}/team/${team._id}`}
-                icon={
-                  <span className="flex size-4 items-center justify-center rounded bg-primary/15 text-[9px] font-semibold text-primary">
-                    {team.key.slice(0, 2)}
-                  </span>
-                }
+    <aside
+      className={cn(
+        "relative flex shrink-0 flex-col border-r bg-sidebar transition-all duration-300",
+        isCollapsed ? "w-0" : "w-60"
+      )}
+    >
+      <div
+        className={cn(
+          "w-60 flex flex-col h-full shrink-0 transition-opacity duration-200",
+          isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+        )}
+      >
+        <div className="flex items-center justify-between gap-2 p-3">
+          <OrganizationSwitcher
+            hidePersonal
+            afterSelectOrganizationUrl="/:slug"
+            afterCreateOrganizationUrl="/:slug"
+            appearance={{
+              elements: {
+                rootBox: "min-w-0",
+                organizationSwitcherTrigger: "max-w-44",
+              },
+            }}
+          />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-7"
+                onClick={openCreateIssue}
+                aria-label="Nueva tarea"
               >
-                {team.name}
-              </NavLink>
-            ))}
-            {teams?.length === 0 && (
-              <button
-                onClick={() => setCreateTeamOpen(true)}
-                className="flex h-7 items-center gap-2 rounded-md px-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-              >
-                <Plus className="size-4" />
-                Crear tu primer equipo
-              </button>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
-      </ScrollArea>
+                <SquarePen className="size-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Nueva tarea (C)</TooltipContent>
+          </Tooltip>
+        </div>
 
-      <div className="flex items-center justify-between border-t p-3">
-        <UserButton />
-        <ThemeToggle />
+        <div className="px-3 pb-2">
+          <button
+            onClick={openPalette}
+            className="flex h-7 w-full items-center gap-2 rounded-md border bg-background px-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <Search className="size-3.5" />
+            Buscar…
+            <kbd className="ml-auto rounded border bg-muted px-1 font-mono text-[10px]">
+              Key K
+            </kbd>
+          </button>
+        </div>
+
+        <ScrollArea className="flex-1 px-3">
+          <nav className="flex flex-col gap-0.5 pb-2">
+            <NavLink href={base} exact icon={<LayoutDashboard className="size-4" />}>
+              Espacio de trabajo
+            </NavLink>
+            <NavLink href={`${base}/projects`} icon={<FolderKanban className="size-4" />}>
+              Productos
+            </NavLink>
+            <NavLink href={`${base}/cycles`} icon={<RefreshCcw className="size-4" />}>
+              Ciclos
+            </NavLink>
+            <NavLink href={`${base}/ai`} icon={<Bot className="size-4" />}>
+              Agente IA
+            </NavLink>
+          </nav>
+        </ScrollArea>
+
+        <div className="flex items-center justify-between border-t p-3">
+          <UserButton />
+          <ThemeToggle />
+        </div>
       </div>
 
-      <CreateTeamDialog open={createTeamOpen} onOpenChange={setCreateTeamOpen} />
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute top-1/2 -right-3 -translate-y-1/2 z-50 flex size-6 items-center justify-center rounded-full border bg-background shadow hover:bg-accent cursor-pointer transition-colors"
+        aria-label={isCollapsed ? "Expandir barra lateral" : "Contraer barra lateral"}
+      >
+        {isCollapsed ? (
+          <ChevronRight className="size-3.5 text-muted-foreground" />
+        ) : (
+          <ChevronLeft className="size-3.5 text-muted-foreground" />
+        )}
+      </button>
     </aside>
   );
 }

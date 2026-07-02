@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CreateCycleDialog } from "@/components/cycles/create-cycle-dialog";
 import { CycleRow } from "@/components/cycles/cycle-row";
 
-/** Cycles index — Track B. Per-team time-boxed cycles, grouped by team. */
+/** Cycles index — Scoped to projects (Track B). Grouped by project. */
 export default function CyclesPage() {
   return (
     <Suspense
@@ -28,44 +28,43 @@ export default function CyclesPage() {
 
 function CyclesPageInner() {
   const cycles = useQuery(api.cycles.listWithProgress);
-  const teams = useQuery(api.teams.list);
+  const projects = useQuery(api.projects.list);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-  // The command palette deep-links here with ?new=true to open the dialog,
-  // so the URL param is treated as a second "open" source of truth.
+
   const wantNew = searchParams.get("new") === "true";
   const [manualOpen, setManualOpen] = useState(false);
-  const [createTeamId, setCreateTeamId] = useState<Id<"teams"> | undefined>(
+  const [createProjectId, setCreateProjectId] = useState<Id<"projects"> | undefined>(
     undefined
   );
   const createOpen = manualOpen || wantNew;
 
-  const openCreate = (teamId?: Id<"teams">) => {
-    setCreateTeamId(teamId);
+  const openCreate = (projectId?: Id<"projects">) => {
+    setCreateProjectId(projectId);
     setManualOpen(true);
   };
 
   const handleCreateOpenChange = (open: boolean) => {
     setManualOpen(open);
     if (!open) {
-      setCreateTeamId(undefined);
+      setCreateProjectId(undefined);
       if (wantNew) {
         router.replace(pathname);
       }
     }
   };
 
-  const loading = cycles === undefined || teams === undefined;
-  const teamsWithCycles = teams?.filter((team) =>
-    cycles?.some((cycle) => cycle.teamId === team._id)
+  const loading = cycles === undefined || projects === undefined;
+  const projectsWithCycles = projects?.filter((project) =>
+    cycles?.some((cycle) => cycle.projectId === project._id)
   );
 
   return (
     <>
       <header className="flex h-12 shrink-0 items-center justify-between border-b px-4">
         <div className="flex items-center gap-2 text-sm">
-          <span className="font-medium">Cycles</span>
+          <span className="font-medium">Ciclos</span>
           {cycles !== undefined && (
             <span className="text-xs text-muted-foreground">
               {cycles.length}
@@ -76,10 +75,10 @@ function CyclesPageInner() {
           size="sm"
           variant="outline"
           onClick={() => openCreate()}
-          disabled={teams !== undefined && teams.length === 0}
+          disabled={projects !== undefined && projects.length === 0}
         >
           <Plus className="size-4" />
-          New cycle
+          Nuevo ciclo
         </Button>
       </header>
 
@@ -91,46 +90,47 @@ function CyclesPageInner() {
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
           <RefreshCcw className="size-8 text-muted-foreground/50" />
           <div>
-            <p className="text-sm font-medium">No cycles yet</p>
+            <p className="text-sm font-medium">No hay ciclos aún</p>
             <p className="text-xs text-muted-foreground">
-              Cycles are time-boxed sprints for a team, numbered automatically.
+              Los ciclos son sprints temporales asociados a un producto, numerados automáticamente.
             </p>
           </div>
-          {teams.length === 0 ? (
+          {projects.length === 0 ? (
             <p className="text-xs text-muted-foreground">
-              Create a team first, then start its first cycle.
+              Creá un producto primero, luego empezá su primer ciclo.
             </p>
           ) : (
             <Button size="sm" onClick={() => openCreate()}>
               <Plus className="size-4" />
-              Start a cycle
+              Comenzar un ciclo
             </Button>
           )}
         </div>
       ) : (
         <ScrollArea className="flex-1">
-          {teamsWithCycles?.map((team) => (
-            <section key={team._id}>
+          {projectsWithCycles?.map((project) => (
+            <section key={project._id}>
               <div className="flex h-9 items-center gap-2 bg-muted/50 px-4 text-sm">
-                <span className="flex size-4 items-center justify-center rounded bg-primary/15 text-[9px] font-semibold text-primary">
-                  {team.key.slice(0, 2)}
-                </span>
-                <span className="font-medium">{team.name}</span>
+                <span
+                  className="size-2 rounded-full"
+                  style={{ backgroundColor: project.color ?? "#5e6ad2" }}
+                />
+                <span className="font-medium">{project.name}</span>
                 <span className="text-xs text-muted-foreground">
-                  {cycles.filter((cycle) => cycle.teamId === team._id).length}
+                  {cycles.filter((cycle) => cycle.projectId === project._id).length}
                 </span>
                 <Button
                   variant="ghost"
                   size="icon"
                   className="ml-auto size-6"
-                  onClick={() => openCreate(team._id)}
-                  aria-label={`New cycle for ${team.name}`}
+                  onClick={() => openCreate(project._id)}
+                  aria-label={`Nuevo ciclo para ${project.name}`}
                 >
                   <Plus className="size-3.5" />
                 </Button>
               </div>
               {cycles
-                .filter((cycle) => cycle.teamId === team._id)
+                .filter((cycle) => cycle.projectId === project._id)
                 .map((cycle) => (
                   <CycleRow key={cycle._id} cycle={cycle} />
                 ))}
@@ -142,7 +142,7 @@ function CyclesPageInner() {
       <CreateCycleDialog
         open={createOpen}
         onOpenChange={handleCreateOpenChange}
-        defaultTeamId={createTeamId}
+        defaultProjectId={createProjectId}
       />
     </>
   );

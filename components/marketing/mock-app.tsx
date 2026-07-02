@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 export function MockApp({ className }: { className?: string }) {
   return (
     <MockFrame className={className}>
-      <MockWindowBar title="vector.app/acme/team/eng" />
+      <MockWindowBar title="panel.styt/styt/team/eng" />
       <div className="flex h-[26rem] text-[13px]">
         <MockSidebar />
         <div className="flex min-w-0 flex-1 flex-col">
@@ -77,9 +77,9 @@ function MockSidebar() {
     <aside className="hidden w-52 shrink-0 flex-col border-r bg-muted/20 md:flex">
       <div className="flex h-10 items-center gap-2 border-b px-3">
         <span className="flex size-5 items-center justify-center rounded bg-primary text-[10px] font-bold text-primary-foreground">
-          A
+          S
         </span>
-        <span className="text-xs font-semibold">Acme Inc</span>
+        <span className="text-xs font-semibold">STYT LTDA</span>
         <ChevronDown className="size-3 text-muted-foreground" />
       </div>
       <nav className="flex flex-col gap-0.5 p-2 text-xs text-muted-foreground">

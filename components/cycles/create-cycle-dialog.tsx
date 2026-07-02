@@ -27,27 +27,27 @@ import { DAY_MS, inputDateToMs, msToInputDate } from "@/components/projects/date
 export function CreateCycleDialog({
   open,
   onOpenChange,
-  defaultTeamId,
+  defaultProjectId,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  defaultTeamId?: Id<"teams">;
+  defaultProjectId?: Id<"projects">;
 }) {
   const params = useParams<{ orgSlug?: string }>();
   const router = useRouter();
-  const teams = useQuery(api.teams.list, open ? {} : "skip");
+  const projects = useQuery(api.projects.list, open ? {} : "skip");
   const createCycle = useMutation(api.cycles.create);
 
-  const [selectedTeamId, setSelectedTeamId] = useState<
-    Id<"teams"> | undefined
+  const [selectedProjectId, setSelectedProjectId] = useState<
+    Id<"projects"> | undefined
   >(undefined);
   const [name, setName] = useState("");
   const [start, setStart] = useState(() => msToInputDate(Date.now()));
   const [end, setEnd] = useState(() => msToInputDate(Date.now() + 13 * DAY_MS));
   const [submitting, setSubmitting] = useState(false);
 
-  // Fall back to the default/first team without needing an effect.
-  const teamId = selectedTeamId ?? defaultTeamId ?? teams?.[0]?._id;
+  // Fall back to the default/first project without needing an effect.
+  const projectId = selectedProjectId ?? defaultProjectId ?? projects?.[0]?._id;
 
   const startMs = inputDateToMs(start);
   const endMs = inputDateToMs(end, "end");
@@ -55,13 +55,13 @@ export function CreateCycleDialog({
     startMs !== undefined && endMs !== undefined && endMs > startMs;
 
   const handleSubmit = async () => {
-    if (!teamId || !datesValid) {
+    if (!projectId || !datesValid) {
       return;
     }
     setSubmitting(true);
     try {
       const cycleId = await createCycle({
-        teamId,
+        projectId,
         name: name.trim() || undefined,
         startDate: startMs,
         endDate: endMs,
@@ -106,20 +106,20 @@ export function CreateCycleDialog({
           />
           <div className="flex flex-wrap items-end gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-xs text-muted-foreground">Equipo</Label>
+              <Label className="text-xs text-muted-foreground">Producto / Proyecto</Label>
               <Select
-                value={teamId ?? ""}
+                value={projectId ?? ""}
                 onValueChange={(value) =>
-                  setSelectedTeamId(value as Id<"teams">)
+                  setSelectedProjectId(value as Id<"projects">)
                 }
               >
                 <SelectTrigger size="sm" className="w-auto gap-1.5">
-                  <SelectValue placeholder="Equipo" />
+                  <SelectValue placeholder="Producto" />
                 </SelectTrigger>
                 <SelectContent>
-                  {teams?.map((team) => (
-                    <SelectItem key={team._id} value={team._id}>
-                      {team.key} · {team.name}
+                  {projects?.map((proj) => (
+                    <SelectItem key={proj._id} value={proj._id}>
+                      {proj.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -158,7 +158,7 @@ export function CreateCycleDialog({
           </Button>
           <Button
             size="sm"
-            disabled={!teamId || !datesValid || submitting}
+            disabled={!projectId || !datesValid || submitting}
             onClick={() => void handleSubmit()}
           >
             Crear ciclo

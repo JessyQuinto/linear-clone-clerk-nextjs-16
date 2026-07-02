@@ -16,6 +16,7 @@ import {
   issueDetailMainSlots,
   issueDetailSidebarSlots,
 } from "@/components/issue-detail/slots";
+import { DocumentationPanel } from "@/components/projects/documentation-panel";
 
 /**
  * Issue detail — foundation skeleton with extension slots. Track C fills in
@@ -144,6 +145,8 @@ function IssueDetail({
           {issueDetailSidebarSlots.map((Slot, index) => (
             <Slot key={index} issue={issue} team={team} />
           ))}
+          <Separator className="my-4" />
+          <DocumentationPanel entityId={issue._id} />
         </aside>
       </div>
     </>

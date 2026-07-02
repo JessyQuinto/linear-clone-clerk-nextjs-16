@@ -66,7 +66,7 @@ export default function SearchPage() {
   return (
     <>
       <header className="flex h-12 shrink-0 items-center border-b px-4">
-        <span className="text-sm font-medium">Search</span>
+        <span className="text-sm font-medium">Buscar</span>
       </header>
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="mx-auto flex w-full max-w-2xl items-center gap-2 px-4 pt-6 pb-3">
@@ -76,17 +76,17 @@ export default function SearchPage() {
             </InputGroupAddon>
             <InputGroupInput
               autoFocus
-              placeholder="Search issues by title or description…"
+              placeholder="Buscar slices por título o descripción…"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
           </InputGroup>
           <Select value={teamFilter} onValueChange={setTeamFilter}>
             <SelectTrigger size="sm" className="w-36 gap-1.5">
-              <SelectValue placeholder="All teams" />
+              <SelectValue placeholder="Todos los equipos" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ALL_TEAMS}>All teams</SelectItem>
+              <SelectItem value={ALL_TEAMS}>Todos los equipos</SelectItem>
               {teams?.map((team) => (
                 <SelectItem key={team._id} value={team._id}>
                   {team.key} · {team.name}
@@ -102,14 +102,14 @@ export default function SearchPage() {
               <div className="flex flex-col items-center gap-2 py-24 text-center">
                 <Search className="size-6 text-muted-foreground/50" />
                 <p className="text-sm text-muted-foreground">
-                  Search issues across your workspace.
+                  Busca slices en todo tu espacio de trabajo.
                 </p>
                 <p className="text-xs text-muted-foreground/70">
-                  Tip: press{" "}
+                  Consejo: presioná{" "}
                   <kbd className="rounded border bg-muted px-1 font-mono text-[10px]">
                     /
                   </kbd>{" "}
-                  anywhere to get here.
+                  en cualquier lugar para venir acá.
                 </p>
               </div>
             ) : searching || waitingForDebounce ? (
@@ -120,14 +120,14 @@ export default function SearchPage() {
               <div className="flex flex-col items-center gap-2 py-24 text-center">
                 <SearchX className="size-6 text-muted-foreground/50" />
                 <p className="text-sm text-muted-foreground">
-                  No issues found for “{debouncedQuery}”.
+                  No se encontraron slices para “{debouncedQuery}”.
                 </p>
               </div>
             ) : (
               <div className="flex flex-col">
                 <p className="px-1 pb-2 text-xs text-muted-foreground">
                   {results?.length}{" "}
-                  {results?.length === 1 ? "result" : "results"}
+                  {results?.length === 1 ? "resultado" : "resultados"}
                 </p>
                 {results?.map((issue) => (
                   <Link

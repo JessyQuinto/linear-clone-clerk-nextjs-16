@@ -66,6 +66,11 @@ function executeQuerySync(queryName: string, args: any): any {
         .filter((i) => i.teamId === args?.teamId)
         .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
     }
+    if (func === "listByAssignee") {
+      return getTable("issues")
+        .filter((i) => i.assigneeId === args?.assigneeId)
+        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+    }
     if (func === "get") {
       return getTable("issues").find((i) => i._id === args?.issueId) || null;
     }
@@ -74,10 +79,10 @@ function executeQuerySync(queryName: string, args: any): any {
   if (namespace === "cycles") {
     if (func === "listWithProgress") {
       const cycles = getTable("cycles");
-      const teams = getTable("teams");
+      const projects = getTable("projects");
       const issues = getTable("issues");
       return cycles.map((c) => {
-        const t = teams.find((team) => team._id === c.teamId);
+        const proj = projects.find((p) => p._id === c.projectId);
         const cycleIssues = issues.filter((i) => i.cycleId === c._id);
         const progress = {
           total: cycleIssues.length,
@@ -90,10 +95,30 @@ function executeQuerySync(queryName: string, args: any): any {
         };
         return {
           ...c,
-          teamName: t?.name || "Unknown",
-          teamKey: t?.key || "UNK",
+          projectName: proj?.name || "Unknown",
+          projectColor: proj?.color || "#888",
+          // keep legacy fields for compat
+          teamName: proj?.name || "Unknown",
+          teamKey: proj?.name?.slice(0, 3).toUpperCase() || "UNK",
           progress,
         };
+      });
+    }
+    if (func === "listByProject") {
+      const cycles = getTable("cycles").filter((c) => c.projectId === args?.projectId);
+      const issues = getTable("issues");
+      return cycles.map((c) => {
+        const cycleIssues = issues.filter((i) => i.cycleId === c._id);
+        const progress = {
+          total: cycleIssues.length,
+          backlog: cycleIssues.filter((i) => i.status === "backlog").length,
+          todo: cycleIssues.filter((i) => i.status === "todo").length,
+          in_progress: cycleIssues.filter((i) => i.status === "in_progress").length,
+          in_review: cycleIssues.filter((i) => i.status === "in_review").length,
+          done: cycleIssues.filter((i) => i.status === "done").length,
+          canceled: cycleIssues.filter((i) => i.status === "canceled").length,
+        };
+        return { ...c, progress };
       });
     }
     if (func === "get") {
@@ -106,11 +131,12 @@ function executeQuerySync(queryName: string, args: any): any {
       const cycle = getTable("cycles").find((c) => c._id === args?.cycleId);
       if (!cycle) return [];
       return getTable("issues").filter(
-        (i) => i.teamId === cycle.teamId && i.cycleId !== args?.cycleId
+        (i) => i.projectId === cycle.projectId && i.cycleId !== args?.cycleId
       );
     }
-    if (func === "currentForTeam") {
-      const cycles = getTable("cycles").filter((c) => c.teamId === args?.teamId);
+    if (func === "currentForTeam" || func === "currentForProject") {
+      const pid = args?.projectId || args?.teamId;
+      const cycles = getTable("cycles").filter((c) => c.projectId === pid);
       const now = Date.now();
       const active = cycles
         .filter((c) => c.startDate <= now && now <= c.endDate)
@@ -148,6 +174,72 @@ function executeQuerySync(queryName: string, args: any): any {
     }
     if (func === "candidateIssues") {
       return getTable("issues").filter((i) => i.projectId !== args?.projectId);
+    }
+  }
+
+  if (namespace === "initiatives") {
+    if (func === "listByProject") {
+      const initiatives = getTable("initiatives").filter((i) => i.projectId === args?.projectId);
+      const issues = getTable("issues");
+      const users = getTable("users");
+      return initiatives.map((ini) => {
+        const iniIssues = issues.filter((iss) => iss.initiativeId === ini._id);
+        const done = iniIssues.filter((i) => i.status === "done").length;
+        const total = iniIssues.length;
+        const lead = users.find((u) => u._id === ini.leadId);
+        return {
+          ...ini,
+          sliceCount: total,
+          slicesDone: done,
+          progress: total > 0 ? Math.round((done / total) * 100) : 0,
+          leadName: lead?.name || "Sin asignar",
+          leadImageUrl: lead?.imageUrl,
+          slicesByStatus: {
+            backlog: iniIssues.filter((i) => i.status === "backlog").length,
+            todo: iniIssues.filter((i) => i.status === "todo").length,
+            in_progress: iniIssues.filter((i) => i.status === "in_progress").length,
+            done,
+          },
+        };
+      });
+    }
+    if (func === "get") {
+      return getTable("initiatives").find((i) => i._id === args?.initiativeId) || null;
+    }
+  }
+
+  if (namespace === "qa") {
+    if (func === "listByProject") {
+      const records = getTable("qaRecords").filter((r) => r.projectId === args?.projectId);
+      const issues = getTable("issues");
+      const users = getTable("users");
+      return records.map((r) => {
+        const slice = issues.find((i) => i._id === r.sliceId);
+        const tester = users.find((u) => u._id === r.testerId);
+        const dev = users.find((u) => u._id === r.devId);
+        return {
+          ...r,
+          sliceName: slice?.title || "Unknown",
+          sliceNumber: slice?.number || 0,
+          testerName: tester?.name || "Unknown",
+          testerImageUrl: tester?.imageUrl,
+          devName: dev?.name || "Unknown",
+          devImageUrl: dev?.imageUrl,
+        };
+      });
+    }
+    if (func === "listBySlice") {
+      const records = getTable("qaRecords").filter((r) => r.sliceId === args?.sliceId);
+      const users = getTable("users");
+      return records.map((r) => {
+        const tester = users.find((u) => u._id === r.testerId);
+        const dev = users.find((u) => u._id === r.devId);
+        return {
+          ...r,
+          testerName: tester?.name || "Unknown",
+          devName: dev?.name || "Unknown",
+        };
+      });
     }
   }
 
@@ -436,7 +528,7 @@ export async function executeMutationSync(mutationName: any, args: any) {
   if (namespace === "cycles") {
     if (func === "create") {
       const latest = getTable("cycles")
-        .filter((c) => c.teamId === args.teamId)
+        .filter((c) => c.projectId === (args.projectId || args.teamId))
         .sort((a, b) => b.number - a.number)[0];
       const num = (latest?.number || 0) + 1;
       const newCycle = insertRow("cycles", {
@@ -452,6 +544,42 @@ export async function executeMutationSync(mutationName: any, args: any) {
       delete cleanUpdates.id;
       delete cleanUpdates.cycleId;
       updateRow("cycles", cycleId, cleanUpdates);
+      return null;
+    }
+  }
+
+  if (namespace === "initiatives") {
+    if (func === "create") {
+      const newIni = insertRow("initiatives", {
+        orgId: org?._id || "org_acme",
+        ...args,
+      });
+      return newIni._id;
+    }
+    if (func === "update") {
+      const iniId = args.id || args.initiativeId;
+      const cleanUpdates = { ...args };
+      delete cleanUpdates.id;
+      delete cleanUpdates.initiativeId;
+      updateRow("initiatives", iniId, cleanUpdates);
+      return null;
+    }
+  }
+
+  if (namespace === "qa") {
+    if (func === "create") {
+      const newQa = insertRow("qaRecords", {
+        orgId: org?._id || "org_acme",
+        ...args,
+      });
+      return newQa._id;
+    }
+    if (func === "update") {
+      const qaId = args.id || args.qaId;
+      const cleanUpdates = { ...args };
+      delete cleanUpdates.id;
+      delete cleanUpdates.qaId;
+      updateRow("qaRecords", qaId, cleanUpdates);
       return null;
     }
   }
@@ -505,6 +633,32 @@ export async function executeMutationSync(mutationName: any, args: any) {
     }
     if (func === "setParent") {
       updateRow("issues", args.issueId, { parentIssueId: args.parentIssueId || undefined });
+      return null;
+    }
+  }
+
+  if (namespace === "documents") {
+    if (func === "listForEntity") {
+      return getTable("projectDocuments").filter(
+        (d: any) => d.entityId === args?.entityId
+      );
+    }
+  }
+
+  if (namespace === "documents") {
+    if (func === "create") {
+      const newDoc = insertRow("projectDocuments", {
+        orgId: org?._id || "org_acme",
+        entityId: args.entityId,
+        title: args.title,
+        url: args.url || undefined,
+        content: args.content || undefined,
+        type: args.type || "link",
+      });
+      return newDoc._id;
+    }
+    if (func === "remove") {
+      deleteRow("projectDocuments", args.documentId);
       return null;
     }
   }

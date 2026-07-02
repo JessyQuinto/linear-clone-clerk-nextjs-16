@@ -224,17 +224,17 @@ export function ActivitySection({ issue }: IssueDetailSlotProps) {
         </p>
       ) : (
         <div className="flex flex-col gap-3">
-          {items.map((item) =>
+          {items.map((item, index) =>
             item.kind === "comment" ? (
               <CommentItem
-                key={item.key}
+                key={item.key || `comment-${index}`}
                 comment={item.comment}
                 isOwn={item.comment.authorId === currentUser?._id}
                 isAdmin={isAdmin}
               />
             ) : (
               <div
-                key={item.key}
+                key={item.key || `activity-${index}`}
                 className="flex items-center gap-2 pl-1 text-xs text-muted-foreground"
               >
                 <UserAvatar

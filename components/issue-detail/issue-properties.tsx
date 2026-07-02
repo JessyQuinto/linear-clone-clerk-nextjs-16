@@ -43,11 +43,16 @@ type IssuePatch = {
   priority?: IssuePriority;
   assigneeId?: Id<"users"> | null;
   estimate?: number | null;
+  initiativeId?: Id<"initiatives"> | null;
 };
 
 export function IssueProperties({ issue }: { issue: Doc<"issues"> }) {
   const updateIssue = useMutation(api.issues.update);
   const members = useQuery(api.organizations.listMembers);
+  const initiatives = useQuery(
+    api.initiatives.listByProject,
+    issue.projectId ? { projectId: issue.projectId } : "skip"
+  );
 
   const update = (patch: IssuePatch) => {
     updateIssue({ issueId: issue._id, ...patch }).catch((error: unknown) => {
@@ -147,6 +152,33 @@ export function IssueProperties({ issue }: { issue: Doc<"issues"> }) {
           </SelectContent>
         </Select>
       </PropertyRow>
+
+      {initiatives && initiatives.length > 0 && (
+        <PropertyRow label="Iniciativa">
+          <Select
+            value={issue.initiativeId ?? "none"}
+            onValueChange={(value) =>
+              update({
+                initiativeId: value === "none" ? null : (value as Id<"initiatives">),
+              })
+            }
+          >
+            <SelectTrigger size="sm" className="w-36 gap-1.5 border-none shadow-none">
+              <SelectValue placeholder="Sin iniciativa" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">
+                <span className="text-muted-foreground">Sin iniciativa</span>
+              </SelectItem>
+              {initiatives.map((ini) => (
+                <SelectItem key={ini._id} value={ini._id}>
+                  {ini.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </PropertyRow>
+      )}
     </div>
   );
 }

@@ -1,10 +1,10 @@
 "use client";
 
 import { useMutation, useQuery } from "convex/react";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ChevronRight, Loader2, List, Columns3, Bookmark, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
@@ -18,6 +18,24 @@ import {
 } from "@/components/projects/project-meta";
 import { ProjectProperties } from "@/components/projects/project-properties";
 import { IssueProgressBar } from "@/components/projects/progress-bar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { InitiativeList } from "@/components/projects/initiative-list";
+import { QaSummaryTable } from "@/components/projects/qa-summary-table";
+import { CycleRow } from "@/components/cycles/cycle-row";
+import {
+  SlicesFilterBar,
+  SliceFilters,
+  filterIssues,
+} from "@/components/projects/slices-filter-bar";
+import { DocumentationPanel } from "@/components/projects/documentation-panel";
+import { BoardView } from "@/components/board/board-view";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 /** Project detail — Clean Linear-style layout with real issue list as primary content. */
 export default function ProjectDetailPage() {
@@ -65,11 +83,98 @@ function ProjectDetail({
   const updateProject = useMutation(api.projects.update);
   const updateIssue = useMutation(api.issues.update);
 
+  // New queries for STYT 4-level hierarchy
+  const initiatives = useQuery(api.initiatives.listByProject, { projectId: project._id });
+  const qaRecords = useQuery(api.qa.listByProject, { projectId: project._id });
+  const cycles = useQuery(api.cycles.listByProject, { projectId: project._id });
+
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description ?? "");
+  const [sliceFilters, setSliceFilters] = useState<SliceFilters>({
+    assigneeFilter: "all",
+    statusFilter: "all",
+    initiativeFilter: "all",
+    cycleFilter: "all",
+  });
+  const [displayMode, setDisplayMode] = useState<"list" | "board">("list");
+  
+  const views = useQuery(api.views.list);
+  const removeView = useMutation(api.views.remove);
+  
+  const defaultTeam = teams?.[0];
+  const labelRows = useQuery(api.views.teamIssueLabels, {
+    teamId: defaultTeam?._id ?? ("team_eng" as Id<"teams">),
+  });
+  const members = useQuery(api.organizations.listMembers);
+
+  const labelsByIssue = useMemo(() => {
+    const map = new Map<Id<"issues">, { labelId: string; name: string; color: string }[]>();
+    for (const row of labelRows ?? []) {
+      const list = map.get(row.issueId) ?? [];
+      list.push({ labelId: row.labelId, name: row.name, color: row.color });
+      map.set(row.issueId, list);
+    }
+    return map;
+  }, [labelRows]);
+
+  const assigneesById = useMemo(() => {
+    const map = new Map<string, { name: string; imageUrl?: string }>();
+    for (const member of members ?? []) {
+      map.set(member.userId, { name: member.name, imageUrl: member.imageUrl });
+    }
+    return map;
+  }, [members]);
+
+  const parseViewFilters = (filtersStr: string, currentUserId?: string): SliceFilters => {
+    try {
+      const parsed = JSON.parse(filtersStr);
+      if ('assigneeFilter' in parsed) {
+        return {
+          assigneeFilter: parsed.assigneeFilter || "all",
+          statusFilter: parsed.statusFilter || "all",
+          initiativeFilter: parsed.initiativeFilter || "all",
+          cycleFilter: parsed.cycleFilter || "all",
+        };
+      }
+      let assigneeFilter = "all";
+      if (parsed.assigneeId === currentUserId) {
+        assigneeFilter = "me";
+      } else if (parsed.assigneeId) {
+        assigneeFilter = "others";
+      }
+      let statusFilter = "all";
+      if (parsed.statuses && parsed.statuses.length > 0) {
+        statusFilter = parsed.statuses[0];
+      } else if (parsed.status) {
+        statusFilter = parsed.status;
+      }
+      return {
+        assigneeFilter,
+        statusFilter,
+        initiativeFilter: parsed.initiativeFilter || "all",
+        cycleFilter: parsed.cycleFilter || "all",
+      };
+    } catch {
+      return {
+        assigneeFilter: "all",
+        statusFilter: "all",
+        initiativeFilter: "all",
+        cycleFilter: "all",
+      };
+    }
+  };
+
+  const currentUserId = useQuery(api.users.current)?._id;
+
+  const filteredIssues = useMemo(() => {
+    if (!issues) return undefined;
+    return filterIssues(issues, sliceFilters, currentUserId);
+  }, [issues, sliceFilters, currentUserId]);
+
+  const hasActiveFilters = Object.values(sliceFilters).some((v) => v !== "all");
 
   const teamKeyFor = (teamId: Id<"teams">) =>
-    teams?.find((team) => team._id === teamId)?.key ?? "?";
+    teams?.find((team) => team._id === teamId)?.key ?? "ING";
 
   const saveName = () => {
     const trimmed = name.trim();
@@ -114,7 +219,7 @@ function ProjectDetail({
             href={`/${orgSlug}/projects`}
             className="text-muted-foreground hover:text-foreground"
           >
-            Proyectos
+            Productos
           </Link>
           <ChevronRight className="size-3.5 shrink-0 text-muted-foreground" />
           <span className="truncate font-medium">{project.name}</span>
@@ -187,27 +292,186 @@ function ProjectDetail({
             </div>
           </div>
 
-          {/* Issues list — primary content */}
-          {issues === undefined || teams === undefined ? (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="size-4 animate-spin text-muted-foreground" />
-            </div>
-          ) : (
-            <GroupedIssueList
-              issues={issues}
-              teamKeyFor={teamKeyFor}
-              emptyState={
-                <div className="flex flex-col items-center gap-2 py-16 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    No hay slices en este proyecto aún.
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Usa el botón &quot;Add issues&quot; para vincular tareas existentes.
-                  </p>
+          {/* Hierarchy Tabs Section */}
+          <div className="border-t">
+            <Tabs defaultValue="initiatives" className="w-full">
+              <div className="border-b px-8 bg-muted/20">
+                <TabsList className="h-10 bg-transparent p-0 gap-6" variant="line">
+                  <TabsTrigger
+                    value="initiatives"
+                    className="h-10 rounded-none border-b-2 border-transparent border-x-transparent border-t-transparent data-[state=active]:border-b-foreground !bg-transparent dark:!bg-transparent !shadow-none after:hidden focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+                  >
+                    Iniciativas
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="slices"
+                    className="h-10 rounded-none border-b-2 border-transparent border-x-transparent border-t-transparent data-[state=active]:border-b-foreground !bg-transparent dark:!bg-transparent !shadow-none after:hidden focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+                  >
+                    Slices
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="qa"
+                    className="h-10 rounded-none border-b-2 border-transparent border-x-transparent border-t-transparent data-[state=active]:border-b-foreground !bg-transparent dark:!bg-transparent !shadow-none after:hidden focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+                  >
+                    Testing & QA
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="cycles"
+                    className="h-10 rounded-none border-b-2 border-transparent border-x-transparent border-t-transparent data-[state=active]:border-b-foreground !bg-transparent dark:!bg-transparent !shadow-none after:hidden focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+                  >
+                    Ciclos
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="initiatives" className="mt-0">
+                <InitiativeList
+                  initiatives={initiatives}
+                  slices={issues}
+                  teamKeyFor={teamKeyFor}
+                  projectId={project._id}
+                />
+              </TabsContent>
+
+              <TabsContent value="slices" className="mt-0">
+                <div className="flex flex-col gap-2 border-b bg-muted/20 px-4 py-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-1 flex-wrap items-center gap-2">
+                    <SlicesFilterBar
+                      filters={sliceFilters}
+                      onFiltersChange={setSliceFilters}
+                      initiatives={initiatives}
+                      cycles={cycles}
+                      hasActiveFilters={hasActiveFilters}
+                    />
+
+                    {/* Saved Views Dropdown */}
+                    {views && views.length > 0 && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-muted-foreground hover:bg-accent/50 focus:outline-none focus-visible:outline-none focus-visible:ring-0">
+                            <Bookmark className="size-3.5" />
+                            Vistas
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-48">
+                          {views.map((v) => (
+                            <DropdownMenuItem
+                              key={v._id}
+                              className="flex items-center justify-between text-xs cursor-pointer"
+                              onClick={() => {
+                                const parsed = parseViewFilters(v.filters, currentUserId);
+                                setSliceFilters(parsed);
+                                toast.success(`Vista "${v.name}" aplicada`);
+                              }}
+                            >
+                              <span className="truncate">{v.name}</span>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-4 opacity-50 hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeView({ viewId: v._id })
+                                    .then(() => toast.success(`Vista "${v.name}" eliminada`))
+                                    .catch(() => toast.error("Error al eliminar la vista"));
+                                }}
+                              >
+                                <Trash2 className="size-3" />
+                              </Button>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </div>
+
+                  <Tabs
+                    value={displayMode}
+                    onValueChange={(val) => setDisplayMode(val as "list" | "board")}
+                  >
+                    <TabsList className="h-7 bg-transparent border p-0 gap-0">
+                      <TabsTrigger
+                        value="list"
+                        className="h-6 gap-1 px-2.5 text-xs rounded-none border-r border-transparent data-[state=active]:border-r data-[state=active]:bg-background focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+                      >
+                        <List className="size-3.5" />
+                        Lista
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="board"
+                        className="h-6 gap-1 px-2.5 text-xs rounded-none data-[state=active]:bg-background focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+                      >
+                        <Columns3 className="size-3.5" />
+                        Kanban
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                 </div>
-              }
-            />
-          )}
+
+                {filteredIssues === undefined || teams === undefined ? (
+                  <div className="flex items-center justify-center py-16">
+                    <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                  </div>
+                ) : displayMode === "board" ? (
+                  <div className="p-4 overflow-x-auto">
+                    <BoardView
+                      issues={filteredIssues}
+                      teamId={defaultTeam?._id ?? ("team_eng" as Id<"teams">)}
+                      teamKey={defaultTeam?.key ?? "ING"}
+                      orgSlug={orgSlug}
+                      labelsByIssue={labelsByIssue}
+                      assigneesById={assigneesById}
+                    />
+                  </div>
+                ) : (
+                  <GroupedIssueList
+                    issues={filteredIssues}
+                    teamKeyFor={teamKeyFor}
+                    emptyState={
+                      <div className="flex flex-col items-center gap-2 py-16 text-center">
+                        <p className="text-sm text-muted-foreground">
+                          {hasActiveFilters
+                            ? "No hay slices que coincidan con los filtros."
+                            : "No hay slices en este proyecto aún."}
+                        </p>
+                        {!hasActiveFilters && (
+                          <p className="text-xs text-muted-foreground">
+                            Usa el botón &quot;Add issues&quot; para vincular tareas existentes.
+                          </p>
+                        )}
+                      </div>
+                    }
+                  />
+                )}
+              </TabsContent>
+
+              <TabsContent value="qa" className="mt-0">
+                <QaSummaryTable
+                  qaRecords={qaRecords}
+                  projectId={project._id}
+                  issues={issues ?? []}
+                />
+              </TabsContent>
+
+              <TabsContent value="cycles" className="mt-0">
+                {cycles === undefined ? (
+                  <div className="flex items-center justify-center py-16">
+                    <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                  </div>
+                ) : cycles.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-2 py-16 text-center text-sm text-muted-foreground">
+                    No hay ciclos activos para este producto.
+                  </div>
+                ) : (
+                  <div className="flex flex-col">
+                    {cycles.map((cycle) => (
+                      <CycleRow key={cycle._id} cycle={cycle} />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
         </ScrollArea>
 
         {/* Properties sidebar */}
@@ -216,6 +480,9 @@ function ProjectDetail({
             Propiedades
           </h3>
           <ProjectProperties project={project} />
+          <div className="mt-4 border-t pt-4">
+            <DocumentationPanel entityId={project._id} />
+          </div>
         </aside>
       </div>
     </>
